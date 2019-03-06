@@ -20,7 +20,7 @@ findDup (x:xs) s = if Set.member x s
                       else findDup xs (Set.insert x s)
 
 part1 :: [Integer] -> Integer
-part1 input = foldl (+) 0 input
+part1 = sum
 
 part2 :: [Integer] -> Integer
 part2 input =

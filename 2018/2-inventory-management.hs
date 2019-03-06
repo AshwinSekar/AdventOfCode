@@ -29,13 +29,13 @@ withoutOneLists (x:xs) = xs : map (x :) (withoutOneLists xs)
 
 findDuplicate :: Ord a => [[a]] -> [Set.Set a] -> a
 findDuplicate (words:remaining) sets =
-  let inserted = map insertMaybe $ zip words sets
+  let inserted = zipWith insertMaybe words sets
       duplicate = find (isJust . fst) inserted
       sets' = map snd inserted
   in if isJust duplicate
        then fromJust $ fst $ fromJust duplicate
        else findDuplicate remaining sets'
-  where insertMaybe (w, s) = if (Set.member w s) then (Just w, s) else (Nothing, Set.insert w s)
+  where insertMaybe w s = if Set.member w s then (Just w, s) else (Nothing, Set.insert w s)
 
 part2 :: [String] -> String
 part2 input =
