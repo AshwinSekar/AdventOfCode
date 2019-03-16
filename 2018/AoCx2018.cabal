@@ -1,0 +1,22 @@
+cabal-version:       2.4
+
+name:                AoCx2018
+version:             0.1.0.0
+synopsis:            Advent of Code 2018
+description:         Problems from the 2018 Advent of Code completed in haskell. https://adventofcode.com/2018
+-- bug-reports:
+license:             BSD-3-Clause
+-- license-file:        LICENSE
+author:              Ashwin Sekar
+maintainer:          ashwin@ashwinsekar.com
+-- copyright:
+-- category:
+extra-source-files:  CHANGELOG.md
+
+executable AoCx2018
+  main-is:             Main.hs
+  -- other-modules:       days/ChronalCalibration days/InventoryManagement
+  -- other-extensions:
+  build-depends:       base ^>=4.12.0.0, containers
+  hs-source-dirs:      src
+  default-language:    Haskell2010
