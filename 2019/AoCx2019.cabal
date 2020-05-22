@@ -23,3 +23,11 @@ executable x1
   other-modules:       Utils
   build-depends:       base >=4.12 && <4.13
   default-language:    Haskell2010
+
+executable x2
+  main-is:             2-1202-program-alarm.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.12 && <4.13,
+                       array
+  default-language:    Haskell2010
