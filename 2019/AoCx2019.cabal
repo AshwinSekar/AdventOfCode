@@ -50,3 +50,18 @@ executable x5
   build-depends:       base >=4.12 && <4.13,
                        array
   default-language:    Haskell2010
+
+executable x6
+  main-is:             6-universal-orbit-map.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.12 && <4.13
+  default-language:    Haskell2010
+
+executable x7
+  main-is:             7-amplification-circuit.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.12 && <4.13,
+                       array
+  default-language:    Haskell2010
