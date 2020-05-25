@@ -1,6 +1,7 @@
 module Utils
 ( readLines,
-  splitString
+  splitString,
+  slices
 ) where
 
 readLines :: [String] -> IO [String]
@@ -15,3 +16,8 @@ splitString p s = case dropWhile p s of
                   "" -> []
                   s' -> w : splitString p s''
                         where (w, s'') = break p s'
+
+slices :: Int -> [a] -> [[a]]
+slices size s = case splitAt size s of
+                    (x, []) -> [x]
+                    (x, y) -> x : slices size y
