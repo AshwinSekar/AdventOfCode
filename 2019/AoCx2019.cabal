@@ -73,3 +73,19 @@ executable x8
   other-modules:       Utils
   build-depends:       base ^>= 4.14
   default-language:    Haskell2010
+
+executable x9
+  main-is:             9-sensor-boost.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       array
+  default-language:    Haskell2010
+
+executable x10
+  main-is:             10-monitoring-station.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       containers
+  default-language:    Haskell2010
