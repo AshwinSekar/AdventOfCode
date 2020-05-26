@@ -100,16 +100,26 @@ main = do
   input <- getLine
   let inputs = splitString (== ',') input
       brain = map read inputs
-      p1 = runST $ driveRobot brain
+      p1State = ProgState 0 0 (0, 0) (0, 1) True Set.empty Set.empty
+      p1 = runST $ cnt <$> driveRobot brain p1State
+      p2State = ProgState 0 0 (0, 0) (0, 1) True (Set.singleton (0, 0)) Set.empty
+      p2 = ascii $ runST (white <$> driveRobot brain p2State)
   putStrLn $ "Part 1: " ++ show (Set.size p1)
+  putStrLn $ "Part 2: \n" ++ unlines p2
 
-driveRobot :: [Integer] -> ST s (Set.Set (Integer, Integer))
-driveRobot brain = do
+ascii whites =
+  let (xs, xb) = (Set.findMin $ Set.map fst whites, Set.findMax $ Set.map fst whites)
+      (ys, yb) = (Set.findMin $ Set.map snd whites, Set.findMax $ Set.map snd whites)
+  in  map (\y -> map (asciiChar y) [xs..xb]) $ reverse [ys..yb]
+  where asciiChar y x = if Set.member (x, y) whites then '#' else ' '
+
+driveRobot :: [Integer] -> ProgState -> ST s ProgState
+driveRobot brain initState = do
   prog <- newArray (0, 4096) 0
   zipWithM_ (writeArray prog) [0..] brain
-  let initState = ProgState 0 0 (0, 0) (0, 1) True Set.empty Set.empty
+  let
   -- evaluate the program
-  cnt <$> execStateT (runProgram' prog) initState
+  execStateT (runProgram' prog) initState
 
 
 runProgram' :: IntProg s -> StateWithOutputs s
