@@ -102,3 +102,17 @@ executable x11
                        transformers,
                        containers
   default-language:    Haskell2010
+
+executable x12
+  main-is:             12-n-body-problem.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14
+  default-language:    Haskell2010
+
+executable x17
+  main-is:             17-set-and-forget.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14
+  default-language:    Haskell2010
