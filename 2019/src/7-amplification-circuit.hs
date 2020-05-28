@@ -6,8 +6,6 @@ import Control.Monad.Trans.Class
 
 import Data.Array.ST
 import Data.List
-import Debug.Trace
-
 
 import Utils
 
@@ -17,7 +15,8 @@ data ProgState s = ProgState { ips :: STArray s Int Integer,
                                amps :: [IntProg s],
                                currentAmp :: Int,
                                inputs :: [Integer],
-                               phase :: [Integer]
+                               phase :: [Integer],
+                               p1 :: Bool
                              }
 type IntProg s = STArray s Integer Integer
 type StateWithOutputs s = StateT (ProgState s) (ST s) [Integer]
@@ -32,12 +31,14 @@ main = do
   let inputs = splitString (== ',') input
       prog = map read inputs
       p1Phases = permutations [0..4]
-      maxThrust = maximum $ map (findThrust prog) p1Phases
-  putStrLn $ "Part 1: " ++ show maxThrust
-  -- putStrLn $ "Part 2: " ++ show p2
+      p1MaxThrust = maximum $ map (findThrust True prog) p1Phases
+      p2Phases = permutations [5..9]
+      p2MaxThrust = maximum $ map (findThrust False prog) p2Phases
+  putStrLn $ "Part 1: " ++ show p1MaxThrust
+  putStrLn $ "Part 2: " ++ show p2MaxThrust
 
-findThrust :: [Integer] -> [Integer] -> Integer
-findThrust prog phase = head $ runST (runProgram prog phase)
+findThrust :: Bool -> [Integer] -> [Integer] -> Integer
+findThrust p1 prog phase = maximum $ runST (runProgram p1 prog phase)
 
 
 -- intprog state
@@ -72,30 +73,30 @@ writeParam offset val = do
 
 getIP :: StateT (ProgState s) (ST s) Integer
 getIP = do is <- gets ips
-           c <- gets currentAmp
+           c <- (`mod` 5) <$> gets currentAmp
            lift $ readArray is c
 
 getProg :: StateT (ProgState s) (ST s) (STArray s Integer Integer)
-getProg = liftM2 (!!) (gets amps) (gets currentAmp)
+getProg = liftM2 (!!) (gets amps) ((`mod` 5) <$> gets currentAmp)
 
 incIP x = ((+ x) <$> getIP) >>= putIP
 
 putIP :: Integer -> StateT (ProgState s) (ST s) ()
 putIP i = do
   is <- gets ips
-  c <- gets currentAmp
+  c <- (`mod` 5) <$> gets currentAmp
   lift $ writeArray is c i
 
 putInputs xs = modify (\s -> s {inputs = xs})
 putCurAmp c = modify (\s -> s {currentAmp = c})
 
-runProgram :: [Integer] -> [Integer] -> ST s [Integer]
-runProgram intprog phase = do
+runProgram :: Bool -> [Integer] -> [Integer] -> ST s [Integer]
+runProgram p1 intprog phase = do
   progs <- mapM (\_ -> newArray (0, 4096) 0) [0..4]
   mapM_ (populate intprog) progs
   is <- newArray (0, 5) 0
   -- evaluate the program
-  evalStateT runProgram' $ ProgState is progs 0 inputs phase
+  evalStateT runProgram' $ ProgState is progs 0 inputs phase p1
   where inputs = [head phase, 0]
 
 populate :: [Integer] -> STArray s Integer Integer -> ST s [()]
@@ -138,12 +139,14 @@ output :: StateWithOutputs s
 output = do
   a <- readParam 1
   nextAmp <- (+1) <$> gets currentAmp
+  p1 <- gets p1
   incIP 2
-  if nextAmp > 4 then (a:) <$> runProgram' else do
-    nextPhase <- (!! nextAmp) <$> gets phase
-    putCurAmp nextAmp
-    putInputs [nextPhase, a]
-    runProgram'
+  phase <- (!! nextAmp) <$> gets phase
+  case (nextAmp > 4, p1) of
+    (True, True) -> (a:) <$> runProgram'
+    (True, False) -> putCurAmp nextAmp >> putInputs [a] >> (a:) <$> runProgram'
+    _ -> putCurAmp nextAmp >> putInputs [phase, a] >> runProgram'
+
 
 jump :: IntCond -> StateWithOutputs s
 jump p = do
