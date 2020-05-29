@@ -122,6 +122,15 @@ executable x13
                        transformers
   default-language:    Haskell2010
 
+executable x14
+  main-is:             14-space-stoichiometry.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       containers,
+                       mtl
+  default-language:    Haskell2010
+
 executable x17
   main-is:             17-set-and-forget.hs
   hs-source-dirs:      src
