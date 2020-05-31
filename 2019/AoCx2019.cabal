@@ -168,3 +168,16 @@ executable x17
                        STMonadTrans,
                        random
   default-language:    Haskell2010
+
+executable x19
+  main-is:             19-tractor-beam.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       array,
+                       mtl,
+                       transformers,
+                       ansi-terminal,
+                       STMonadTrans,
+                       random
+  default-language:    Haskell2010
