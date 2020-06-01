@@ -155,7 +155,6 @@ executable x16
   build-depends:       base ^>= 4.14
   default-language:    Haskell2010
 
-
 executable x17
   main-is:             17-set-and-forget.hs
   hs-source-dirs:      src
@@ -193,4 +192,11 @@ executable x21
                        ansi-terminal,
                        STMonadTrans,
                        random
+  default-language:    Haskell2010
+
+executable x22
+  main-is:             22-slam-shuffle.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14
   default-language:    Haskell2010
