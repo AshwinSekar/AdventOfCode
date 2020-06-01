@@ -1,0 +1,49 @@
+west
+take cake
+west
+take pointer
+south
+take monolith
+north
+west
+south
+take tambourine
+east
+east
+east
+take mug
+west
+west
+west
+north
+east
+east
+east
+south
+take coin
+east
+take mouse
+south
+south
+take hypercube
+north
+north
+west
+south
+west
+north
+north
+inv
+drop pointer
+drop hypercube
+drop cake
+drop tambourine
+drop monolith
+drop mouse
+drop coin
+drop mug
+take cake
+take monolith
+take coin
+take mug
+north
