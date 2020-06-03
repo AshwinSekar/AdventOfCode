@@ -147,7 +147,9 @@ executable x15
                        transformers,
                        ansi-terminal,
                        STMonadTrans,
-                       random
+                       random,
+                       containers,
+                       heap
   default-language:    Haskell2010
 
 executable x16
