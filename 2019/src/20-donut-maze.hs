@@ -13,31 +13,36 @@ import Utils
 import Debug.Trace
 
 data BFSState = BFSState { pq :: PriorityQueue,
-                             visited :: Map.Map (Int, Int) Int,
-                             end :: (Int, Int)
-                           }
-type PriorityQueue = PQ.MinPrioHeap Int (Int, Int)
+                           visited :: Map.Map ((Int, Int), Int) Int,
+                           end :: ((Int, Int), Maybe Int),
+                           portals :: PortalMap,
+                           maze :: Maze
+                         }
+type PriorityQueue = PQ.MinPrioHeap Int ((Int, Int), Int)
 type DonutState = State BFSState (Maybe Int)
+type PortalMap = Map.Map (Int, Int) ((Int, Int), Int)
+type Maze = Array (Int, Int) Char
 
 main :: IO ()
 main = do
   putStrLn "Input:"
   input <- readLines []
-  let grid = parseGrid input
-      (start, end, portals) = parsePortal grid
-      Just p1 = findShortestPath grid portals start end
+  let maze = parseMaze input
+      (start, end, portals) = parsePortal maze
+      Just p1 = findShortestPath maze portals start (end, Nothing)
+      Just p2 = findShortestPath maze portals start (end, Just 0)
   putStrLn $ "Part 1: " ++ show p1
-  -- putStrLn $ "Part 2: " ++ p2
+  putStrLn $ "Part 2: " ++ show p2
 
-findShortestPath :: Array (Int, Int) Char -> Map.Map (Int, Int) (Int, Int) -> (Int, Int) -> (Int, Int) -> Maybe Int
+findShortestPath :: Maze -> PortalMap -> (Int, Int) -> ((Int, Int), Maybe Int) -> Maybe Int
 findShortestPath maze portals start end =
-  let pq = PQ.singleton (0, start)
+  let pq = PQ.singleton (0, (start, 0))
       v = Map.empty
-  in evalState (bfs maze portals) (BFSState pq v end)
+  in evalState bfs (BFSState pq v end portals maze)
 
 
-parseGrid :: [String] -> Array (Int, Int) Char
-parseGrid inputs =
+parseMaze :: [String] -> Maze
+parseMaze inputs =
   let h = length inputs
       w = length $ head inputs
 
@@ -47,77 +52,90 @@ parseGrid inputs =
 
   in array ((0, 0), (h - 1, w - 1)) $ parse 0 0 inputs
 
-parsePortal :: Array (Int, Int) Char -> ((Int, Int), (Int, Int), Map.Map (Int, Int) (Int, Int))
+parsePortal :: Array (Int, Int) Char -> ((Int, Int), (Int, Int), PortalMap)
 parsePortal grid =
-  let is = indices grid
+  let ((0, 0), (h , w)) = bounds grid
+      is = indices grid
       opens = filter (\p -> grid ! p == '.') is
       open = mapMaybe findV opens ++ mapMaybe findH opens
       openMap = Map.fromListWith (++) open
-      (("AA", [start]), openMap') = Map.deleteFindMin openMap
-      (("ZZ", [end]), openMap'') = Map.deleteFindMax openMap'
-      portalPoints = map (\[i, j] -> (i, j)) $ Map.elems openMap''
-      portals = portalPoints ++ map (\(i, j) -> (j, i)) portalPoints
+      (("AA", [(start, 1)]), openMap') = Map.deleteFindMin openMap
+      (("ZZ", [(end, 1)]), openMap'') = Map.deleteFindMax openMap'
+      portalPoints = map (\[(i, _), (j, l)] -> (i, (j, l))) $ Map.elems openMap''
+      portals = portalPoints ++ map (\[(i, l), (j, _)] -> (j, (i, l))) (Map.elems openMap'')
 
       findV (i, j) =
-        case (grid ! (i + 2, j), grid ! (i + 1, j), grid ! (i - 1, j), grid ! (i - 2, j)) of
-          (_, '.', '.', _) ->  Nothing
-          (_, '.', '#', _) ->  Nothing
-          (_, '#', '.', _) ->  Nothing
-          (_, '#', '#', _) ->  Nothing
-          (a, b, '.', _) ->  Just ([a, b], [(i, j)])
-          (_, '.', a, b) ->  Just ([a, b], [(i, j)])
+        let surroundings = [(i + 2, j), (i + 1, j), (i - 1, j), (i - 2, j)]
+            alpha = filter isAlpha $ map (grid !) surroundings
+        in case (i, alpha) of
+             (i, [a, b])
+               | i == 2 -> Just ([a, b], [((i, j), 1)])
+               | i == h - 2 -> Just ([a, b], [((i, j), 1)])
+               | otherwise -> Just ([a, b], [((i, j), -1)])
+             _ -> Nothing
 
       findH (i, j) =
-        case (grid ! (i, j + 2), grid ! (i, j + 1), grid ! (i, j - 1), grid ! (i, j - 2)) of
-          (_, '.', '.', _) ->  Nothing
-          (_, '.', '#', _) ->  Nothing
-          (_, '#', '.', _) ->  Nothing
-          (_, '#', '#', _) ->  Nothing
-          (a, b, '.', _) ->  Just ([a, b], [(i, j)])
-          (_, '.', a, b) ->  Just ([a, b], [(i, j)])
+        let surroundings = [(i, j + 2), (i, j + 1), (i, j - 1), (i, j - 2)]
+            alpha = filter isAlpha $ map (grid !) surroundings
+        in case (j, alpha) of
+             (j, [a, b])
+               | j == 2 -> Just ([a, b], [((i, j), 1)])
+               | j == w - 2 -> Just ([a, b], [((i, j), 1)])
+               | otherwise -> Just ([a, b], [((i, j), -1)])
+             _ -> Nothing
 
   in (start, end, Map.fromList portals)
 
-bfs maze portals = do
+bfs = do
   pq <- gets pq
   e <- gets end
-  case PQ.view pq of
-    Nothing -> return Nothing
-    Just ((p, pos), pq')
+  maze <- gets maze
+  portals <- gets portals
+  case (PQ.view pq, e) of
+    (Nothing, _) -> return Nothing
+    (Just ((p, (pos, _)), pq'), (e, Nothing))
       | pos == e -> return $ Just p
-      | otherwise -> putPQ pq' >> bfs' maze portals p pos
+      | otherwise -> putPQ pq' >> bfs' p (pos, 0)
+    (Just ((p, (pos, -1)), pq'), (_, Just _)) -> putPQ pq' >> bfs
+    (Just ((p, loc), pq'), (e, Just l))
+      | loc == (e, l) -> return $ Just p
+      | otherwise -> putPQ pq' >> bfs' p loc
 
-bfs' :: Array (Int, Int) Char -> Map.Map (Int, Int) (Int, Int) -> Int -> (Int, Int) -> DonutState
-bfs' maze portals p pos = do
+
+bfs' :: Int -> ((Int, Int), Int) ->  DonutState
+bfs' p loc@(pos, l) = do
   v <- gets visited
+  maze <- gets maze
   let status = maze ! pos
-  case (status, Map.member pos v) of
-    ('.', True) -> updateV pos p >> bfs maze portals
-    ('.', False) -> updateV pos p >> addDirs portals pos p >> bfs maze portals
-    _ -> bfs maze portals
+  case (status, Map.member loc v) of
+    ('.', True) -> updateV loc p >> bfs
+    ('.', False) -> updateV loc p >> addDirs loc p >> bfs
+    _ -> bfs
 
-updateV :: (Int, Int) -> Int -> State BFSState ()
-updateV pos p = do
+updateV :: ((Int, Int), Int) -> Int -> State BFSState ()
+updateV loc p = do
   v <- gets visited
-  let v' = Map.insertWith min pos p v
+  let v' = Map.insertWith min loc p v
   putV v'
 
-addDirs :: Map.Map (Int, Int) (Int, Int) -> (Int, Int) -> Int -> State BFSState ()
-addDirs portals pos p = do
+addDirs :: ((Int, Int), Int) -> Int -> State BFSState ()
+addDirs loc@(pos, l) p = do
   pq <- gets pq
-  let pos' = map (plusTuple pos) ds
-      pos'' = if Map.member pos portals
-                then portals Map.! pos : pos'
-                else pos'
-  putPQ $ foldl (ins p) pq pos''
+  portals <- gets portals
+  let loc' = map (plusLoc loc) ds
+      loc'' = if Map.member pos portals
+                then plusLevel l (portals Map.! pos) : loc'
+                else loc'
+  putPQ $ foldl (ins p) pq loc''
   where ds = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        plusTuple (y, x) (y', x') = (y + y', x + x')
+        plusLoc ((y, x), l) (y', x') = ((y + y', x + x'), l)
+        plusLevel l' (pos, l) = (pos, l + l')
 
-ins :: Int -> PriorityQueue -> (Int, Int) -> PriorityQueue
-ins p pq' pos = PQ.insert (p + 1, pos) pq'
+ins :: Int -> PriorityQueue -> ((Int, Int), Int) -> PriorityQueue
+ins p pq' loc = PQ.insert (p + 1, loc) pq'
 
 
-putV :: Map.Map (Int, Int) Int -> State BFSState ()
+putV :: Map.Map ((Int, Int), Int) Int -> State BFSState ()
 putV v = modify (\s -> s {visited = v})
 
 putPQ :: PriorityQueue -> State BFSState ()
