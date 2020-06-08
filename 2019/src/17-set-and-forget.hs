@@ -22,9 +22,7 @@ import Utils
 -- prog, instruction pointer, relative base, inputs
 data ProgState s = ProgState { ip :: Integer,
                                base :: Integer,
-                               movement :: Integer,
-                               key :: MVar Char,
-                               inputF :: InputF s,
+                               inputs :: [Int],
                                outputs :: [Int]
                              }
 type IntProg s = STArray s Integer Integer
@@ -39,34 +37,25 @@ liftIO = lift . lift
 main :: IO ()
 main = do
   input <- filter (/= '\n') <$> readFile "data/17-puzzle-input"
-  k <- newEmptyMVar
   let inputs = splitString (== ',') input
       intprog = map read inputs :: [Integer]
-  path <- runRobot intprog k
+  path <- runRobot intprog False
   let path' = group path
       path'' = concatMap compress path'
   showCursor
   putStrLn path
   putStrLn path''
+  void $ runRobot intprog True
 
 compress s = case head s of
   'x' -> show (length s) ++ "-"
   a -> a : "-"
 
-runRobot :: [Integer] -> MVar Char -> IO String
-runRobot prog k = do
+runRobot :: [Integer] -> Bool -> IO String
+runRobot prog t = do
   clearScreen
-  hideCursor
-  setupKeypress >> forkIO getKeypress
   hFlush stdout
-  runSTT $ runProgram prog k getKey
-  -- runSTT $ runProgram prog k getAi
-  where getKeypress = getChar >>= putMVar k >> getKeypress
-        setupKeypress = hSetBuffering stdin NoBuffering >> hSetEcho stdin False
-
-displayScaffold = do
-  o <- reverse <$> gets outputs
-  liftIO $ putStrLn (map chr o)
+  runSTT $ runProgram prog t
 
 countIntersections = do
   o <- reverse <$> gets outputs
@@ -126,13 +115,14 @@ turnL (1, 0)  = (0, 1)
 turnL (0, -1) = (1, 0)
 turnL (-1, 0) = (0, -1)
 
-runProgram :: [Integer] -> MVar Char -> InputF s -> STT s IO String
-runProgram intprog k input = do
+runProgram :: [Integer] -> Bool -> STT s IO String
+runProgram intprog t = do
   prog <- newArray (0, 4096) 0
   zipWithM_ (writeArray prog) [0..] intprog
-  let initState = ProgState 0 0 0 k input []
+  when t $ writeArray prog 0 2
+  let initState = ProgState 0 0 [] []
   -- evaluate the program
-  evalStateT (runProgram' prog >> displayScaffold >> countIntersections >> path) initState
+  evalStateT (runProgram' prog >> countIntersections >> path) initState
 
 
 runProgram' :: IntProg s -> GameState s
@@ -187,7 +177,7 @@ writeParam prog offset val = do
 
 putIP i = modify (\s -> s {ip = i})
 putBase b = modify (\s -> s {base = b})
-putMov m = modify (\s -> s {movement = m})
+putInputs i = modify (\s -> s {inputs = i})
 putOutputs o = modify (\s -> s {outputs = o})
 
 plusMult :: IntProg s -> IntOp -> GameState s
@@ -197,35 +187,29 @@ plusMult prog op = do
   gets ip >>= putIP . (+4)
   runProgram' prog
 
-getKey :: InputF s
-getKey = do
-  -- get input
-  k <- wait
-  case k of
-    'w' -> return 1
-    'a' -> return 3
-    's' -> return 2
-    'd' -> return 4
-    _ -> getKey
-
-getAi :: InputF s
-getAi = liftIO $ randomRIO (1, 4)
+getInput :: [Int] -> StateT (ProgState s) (STT s IO) [Int]
+getInput (x:xs) = return $ x:xs
+getInput [] = do
+  inputs <- liftIO $ readLines []
+  let withNLine = map (\s -> s ++ [chr 10]) inputs
+      ascii = concatMap (map ord) withNLine
+  putInputs ascii
+  return ascii
 
 input :: IntProg s -> GameState s
 input prog = do
-  mov <- (join . gets) inputF
-  writeParam prog 1 mov
-  putMov mov
+  m:ins <- getInput =<< gets inputs
+  writeParam prog 1 (fromIntegral m)
+  putInputs ins
   gets ip >>= putIP . (+2)
   runProgram' prog
-
-wait =  do
-  k <- (liftIO . tryTakeMVar) =<< gets key
-  maybe ((liftIO . threadDelay) 5000 >> wait) return k
 
 output :: IntProg s -> GameState s
 output prog = do
   c <- fromIntegral <$> readParam prog 1
+  if c <= 128
+    then liftIO $ putChar (chr c)
+    else liftIO $ putStrLn ("Total dust: " ++ show c)
   gets outputs >>= putOutputs . (c:)
   gets ip >>= putIP . (+2)
   runProgram' prog
