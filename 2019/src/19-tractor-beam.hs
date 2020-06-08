@@ -10,6 +10,7 @@ import Data.Array
 import Data.Char
 import Data.List
 import Data.Maybe
+import qualified Data.Map as Map
 
 import Debug.Trace
 
@@ -22,14 +23,13 @@ import Utils
 -- prog, instruction pointer, relative base, inputs
 data ProgState s = ProgState { ip :: Integer,
                                base :: Integer,
-                               inputs :: [Int],
-                               curPos :: Maybe (Int, Int),
-                               grid :: STArray s (Int, Int) Int
+                               inputs :: [Int]
                              }
 type IntProg s = STArray s Integer Integer
-type GameState s = StateT (ProgState s) (STT s IO) ()
+type GameState s = StateT (ProgState s) (STT s IO) Int
 type IntOp = (Integer -> Integer -> Integer)
 type IntCond = (Integer -> Integer -> Bool)
+type RowData = Map.Map Int (Int, Int)
 
 liftIO :: IO a -> StateT (ProgState s) (STT s IO) a
 liftIO = lift . lift
@@ -40,48 +40,61 @@ main = do
   let inputs = splitString (== ',') input
       intprog = map read inputs :: [Integer]
   p1 <- countTractor intprog 49
+  (x, y) <- getSquare intprog 100
   putStrLn $ "Part 1: " ++ show p1
+  putStrLn $ "Part 2: " ++ show (10000 * x + y)
 
 countTractor :: [Integer] -> Int -> IO Int
-countTractor prog b = runSTT $ count =<< findGrid prog b
+countTractor prog b = do
+  s <- runSTT $ findGrid prog b
+  return $ length (filter (== 1) s)
 
-count :: STArray s (Int, Int) Int -> STT s IO Int
-count g = length <$> (filterM (return . (== 1)) =<< getElems g)
-
-findGrid :: [Integer] -> Int -> STT s IO (STArray s (Int, Int) Int)
+findGrid :: [Integer] -> Int -> STT s IO [Int]
 findGrid prog b =
-  let pos = concat $ liftM2 lister [0..b] [0..b]
-  in runProgram prog pos
+  let pos = liftM2 lister [0..b] [0..b]
+  in mapM (runProgram prog) pos
   where lister a b = [a, b]
 
-displayGrid :: STArray s (Int, Int) Int -> Int -> STT s IO ()
-displayGrid g b = do
-  elems <- getElems g
-  let chars = map disp elems
-      gs = slices b chars
-  lift $ putStrLn (unlines gs)
-  where disp 1 = '#'
-        disp 0 = '.'
+getSquare :: [Integer] -> Int -> IO (Int, Int)
+getSquare prog b = do
+  let init = Map.singleton 5 (3, 1) -- y pos, x position, length
+  rows <- foldM (computeRow prog) init [6..2000]
+  let Just y = find (fits b rows) [6..2000]
+  return (fst $ rows Map.! (y + b -1 ), y)
 
-runProgram :: [Integer] -> [Int] -> STT s IO (STArray s (Int, Int) Int)
-runProgram intprog pos = do
-  let bound = floor $ sqrt (fromIntegral (length pos) / 2)
-  g <- newArray ((0, 0), (bound - 1, bound - 1)) (-1)
-  let initState = ProgState 0 0 pos Nothing g
+fits b rows y =
+  let (s, l) = rows Map.! y
+      (s', l') = rows Map.! (y + b - 1)
+  in l - (s' - s) >= b
+
+computeRow :: [Integer] -> RowData -> Int -> IO RowData
+computeRow prog rd y' = do
+  let (x, l) = rd Map.! (y' - 1)
+  x' <- findStart prog y' x
+  l' <- findL prog y' x' l
+  return $ Map.insert y' (x', l') rd
+
+findStart prog y x = do
+  s <- runSTT $ runProgram prog [x, y]
+  if s == 1
+    then return x
+    else findStart prog y (x + 1)
+
+findL prog y start l = do
+  s1 <- runSTT $ runProgram prog [start + l - 1, y]
+  s2 <- runSTT $ runProgram prog [start + l, y]
+  case (s1, s2) of
+    (0, 0) -> findL prog y start (l - 1)
+    (1, 1) -> findL prog y start (l + 1)
+    (1, 0) -> return l
+
+runProgram :: [Integer] -> [Int] -> STT s IO Int
+runProgram intprog ins = do
+  prog <- newArray (0, 4096) 0
+  zipWithM_ (writeArray prog) [0..] intprog
+  let initState = ProgState 0 0 ins
   -- evaluate the program
-  g <- grid <$> execStateT (drain intprog) initState
-  -- display
-  displayGrid g bound
-  return g
-
-drain :: [Integer] -> GameState s
-drain intprog = do
-  prog <- lift $ newArray (0, 4096) 0
-  lift $ zipWithM_ (writeArray prog) [0..] intprog
-  ins <- gets inputs
-  if null ins
-    then return ()
-    else putIP 0  >> putBase 0 >> runProgram' prog >> drain intprog
+  evalStateT (runProgram' prog) initState
 
 runProgram' :: IntProg s -> GameState s
 runProgram' prog = do
@@ -97,7 +110,7 @@ runProgram' prog = do
     7 -> cond prog (<)
     8 -> cond prog (==)
     9 -> adjBase prog
-    99 -> return ()
+    99 -> return $ -1
 
 shift offset instr = (instr `div` place) `rem` 10
   where place = 10 ^ (offset + 1)
@@ -135,7 +148,6 @@ writeParam prog offset val = do
 
 putIP i = modify (\s -> s {ip = i})
 putBase b = modify (\s -> s {base = b})
-putPos p = modify (\s -> s {curPos = p})
 putInputs i = modify (\s -> s {inputs = i})
 
 plusMult :: IntProg s -> IntOp -> GameState s
@@ -145,14 +157,9 @@ plusMult prog op = do
   gets ip >>= putIP . (+4)
   runProgram' prog
 
-getPos Nothing (y:x:_) = return $ Just (y, x)
-getPos pos _ = return pos
-
 input :: IntProg s -> GameState s
 input prog = do
-  cur <- gets curPos
   m:ins <- gets inputs
-  putPos =<< getPos cur =<< gets inputs
   writeParam prog 1 (fromIntegral m)
   putInputs ins
   gets ip >>= putIP . (+2)
@@ -161,12 +168,8 @@ input prog = do
 output :: IntProg s -> GameState s
 output prog = do
   c <- fromIntegral <$> readParam prog 1
-  Just (y, x) <- gets curPos
-  g <- gets grid
-  lift $ writeArray g (y, x) c
-  putPos Nothing
   gets ip >>= putIP . (+2)
-  runProgram' prog
+  return c
 
 jump :: IntProg s -> IntCond -> GameState s
 jump prog p = do

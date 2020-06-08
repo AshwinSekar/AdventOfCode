@@ -178,6 +178,7 @@ executable x19
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
                        array,
+                       containers,
                        mtl,
                        transformers,
                        ansi-terminal,
