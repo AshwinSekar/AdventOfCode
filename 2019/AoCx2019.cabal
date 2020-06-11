@@ -229,6 +229,20 @@ executable x22
   build-depends:       base ^>= 4.14
   default-language:    Haskell2010
 
+executable x23
+  main-is:             23-category-six.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       array,
+                       containers,
+                       mtl,
+                       transformers,
+                       ansi-terminal,
+                       STMonadTrans,
+                       random
+  default-language:    Haskell2010
+
 executable x24
   main-is:             24-planet-of-discord.hs
   hs-source-dirs:      src
