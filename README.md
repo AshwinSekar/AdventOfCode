@@ -1,3 +1,3 @@
 # AdventOfCode
 
-Advent of code challenge written in Haskell
+Advent of code challenges written in Haskell
