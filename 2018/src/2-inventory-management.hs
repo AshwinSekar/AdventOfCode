@@ -1,4 +1,4 @@
-module InventoryManagement (part1, part2) where
+import Utils
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
@@ -25,6 +25,15 @@ findDuplicate (words:remaining) sets =
        then fromJust $ fst $ fromJust duplicate
        else findDuplicate remaining sets'
   where insertMaybe w s = if Set.member w s then (Just w, s) else (Nothing, Set.insert w s)
+
+main :: IO ()
+main = do
+  putStrLn "Input:"
+  input <- readLines []
+  let p1 = part1 input
+  let p2 = part2 input
+  putStrLn $ "Part 1: " ++ show p1
+  putStrLn $ "Part 2: " ++ show p2
 
 part1 :: [String] -> Int
 part1 input =
