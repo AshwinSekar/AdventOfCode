@@ -1,16 +1,11 @@
-cabal-version:       >=2
+cabal-version:       2.0
 
 name:                AoCx2019
 version:             0.1.0.0
--- synopsis:
--- description:
--- bug-reports:
--- license:
--- license-file:        LICENSE
+synopsis:            Advent of Code 2019
+description:         Problems from the 2019 Advent of Code completed in haskell. https://adventofcode.com/2019
 author:              Ashwin Sekar
 maintainer:          gaurjas@gmail.com
--- copyright:
--- category:
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
 
@@ -181,7 +176,7 @@ executable x18
                        heap,
                        containers,
                        mtl
-  extensions:          TupleSections
+  default-extensions:  TupleSections
   default-language:    Haskell2010
 
 executable x19
@@ -250,7 +245,7 @@ executable x24
   build-depends:       base ^>= 4.14,
                        array,
                        containers
-  extensions:          TupleSections
+  default-extensions:  TupleSections
   default-language:    Haskell2010
 
 executable x25
