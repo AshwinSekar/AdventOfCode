@@ -1,8 +1,13 @@
 module Utils
 ( readLines,
   splitString,
-  slices
+  slices,
+  kForMaxV
 ) where
+
+import Data.Function
+import qualified Data.Map as Map
+
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -21,3 +26,10 @@ slices :: Int -> [a] -> [[a]]
 slices size s = case splitAt size s of
                     (x, []) -> [x]
                     (x, y) -> x : slices size y
+
+kForMaxV :: (Ord k, Ord v) => Map.Map k v -> k
+kForMaxV m =
+  Map.filter (== maxM) m
+   & Map.keys
+   & head
+  where maxM = maximum $ Map.elems m
