@@ -1,7 +1,6 @@
 import Utils
 
 import Control.Monad
-import Control.Monad.STM
 
 import Data.Char
 import Data.Foldable
@@ -10,51 +9,51 @@ import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Data.List
 import Data.Maybe
-import qualified Data.STM.LinkedList as LL
+
+import System.IO
 
 import Debug.Trace
-
-type Reaction = LL.LinkedList Char
 
 
 main :: IO ()
 main = do
-  input <- filter (/= '\n') <$> readFile "data/5-puzzle-input"
-  p1 <- atomically $ parse input >>= collapse >>= LL.length
+  p1 <- withFile "data/5-puzzle-input" ReadMode scanPolymer
+  p2 <- withFile "data/5-puzzle-input" ReadMode improvePolymer
   putStrLn $ "Part 1: " ++ show p1
-  -- putStrLn $ "Part 2: " ++ show p2
+  putStrLn $ "Part 2: " ++ show p2
 
+scanPolymer :: Handle -> IO Int
+scanPolymer h = scanPolymer' h [] 0
 
-parse :: String -> STM Reaction
-parse s = do
-  ll <- LL.empty
-  traverse_ (`LL.append` ll) s
-  return ll
+scanPolymer' :: Handle -> String -> Int -> IO Int
+scanPolymer' h seen n = do
+  c <- hGetChar h
+  scan c seen
+  where scan '\n' _ = return n
+        scan c [] = scanPolymer' h [c] 1
+        scan c (x:xs)
+          | eqOpCase c x = scanPolymer' h xs (n - 1)
+          | otherwise    = scanPolymer' h (c:seen) (n + 1)
 
-toString :: Reaction -> STM String
-toString = LL.toList
+improvePolymer :: Handle -> IO Int
+improvePolymer h = map (, (0, [])) ['A'..'Z']
+                    & Map.fromList
+                    & improve h
+                    & (Map.elems <$>)
+                    & (minimum <$>)
+                    & (fst <$>)
 
-
-
-
-collapse :: Reaction -> STM Reaction
-collapse ll = do
-  st <- LL.start ll
-  case st of
-    Nothing -> return ll
-    Just n -> collapse' ll n
-
-collapse' :: Reaction -> LL.Node Char -> STM Reaction
-collapse' ll n = do
-  nP <- LL.prev n
-  nN <- LL.next n
-  let del = LL.delete n >> LL.delete (fromJust nN)
-  case (eqOpCase nVal . LL.value <$> nN, nP)  of
-    (Nothing, _) -> return ll
-    (Just False, _) -> collapse' ll (fromJust nN)
-    (Just True, Nothing) -> del >> collapse ll
-    (Just True, Just nP) -> del >> collapse' ll nP
-  where nVal = LL.value n
+improve :: Handle -> Map.Map Char (Int, String) -> IO (Map.Map Char (Int, String))
+improve h seen = do
+  c <- hGetChar h
+  if c == '\n' then return seen else improve h $ Map.mapWithKey (improve' c) seen
+  where improve' c k (_, [])
+          | k == toUpper c = (0, [])
+          | otherwise      = (1, [c])
+        improve' c k (n, s@(x:xs))
+          | k == toUpper c = (n, s)
+          | eqOpCase c x   = (n - 1, xs)
+          | otherwise      = (n + 1, c:s)
 
 eqOpCase :: Char -> Char -> Bool
 eqOpCase a b = (toUpper a == toUpper b) && ((isUpper a && isLower b) || (isLower a && isUpper b))

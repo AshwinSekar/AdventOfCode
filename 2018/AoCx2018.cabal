@@ -39,9 +39,8 @@ executable x5
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
-                       containers,
-                       stm,
-                       stm-linkedlist
+                       containers
+  default-extensions:  TupleSections
   default-language:    Haskell2010
 
 executable x7
