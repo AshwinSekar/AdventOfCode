@@ -2,7 +2,8 @@ module Utils
 ( readLines,
   splitString,
   slices,
-  kForMaxV
+  kForMaxV,
+  mapKWithV
 ) where
 
 import Data.Function
@@ -33,3 +34,6 @@ kForMaxV m =
    & Map.keys
    & head
   where maxM = maximum $ Map.elems m
+
+mapKWithV :: (Ord k1, Ord k2) => (k1 -> a -> k2) -> Map.Map k1 a -> Map.Map k2 a
+mapKWithV f mp = Map.mapKeys (\ k -> f k (mp Map.! k)) mp
