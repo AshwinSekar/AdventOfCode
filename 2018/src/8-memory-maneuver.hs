@@ -5,8 +5,6 @@ import Control.Monad
 import Data.Char
 import Data.Foldable
 import Data.Function
-import qualified Data.Map as Map
-import qualified Data.Set as Set
 import Data.List
 import Data.Maybe
 
