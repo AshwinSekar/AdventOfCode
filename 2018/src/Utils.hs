@@ -3,7 +3,8 @@ module Utils
   splitString,
   slices,
   kForMaxV,
-  mapKWithV
+  mapKWithV,
+  plusTuple
 ) where
 
 import Data.Function
@@ -37,3 +38,7 @@ kForMaxV m =
 
 mapKWithV :: (Ord k1, Ord k2) => (k1 -> a -> k2) -> Map.Map k1 a -> Map.Map k2 a
 mapKWithV f mp = Map.mapKeys (\ k -> f k (mp Map.! k)) mp
+
+
+plusTuple :: Num a => (a, a) -> (a, a) -> (a, a)
+plusTuple (i, j) (i', j') = (i + i', j + j')
