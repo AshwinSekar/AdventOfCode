@@ -4,7 +4,11 @@ module Utils
   slices,
   kForMaxV,
   mapKWithV,
-  plusTuple
+  (^+),
+  (^*),
+  (^-),
+  (^$+),
+  neigh
 ) where
 
 import Data.Function
@@ -40,5 +44,17 @@ mapKWithV :: (Ord k1, Ord k2) => (k1 -> a -> k2) -> Map.Map k1 a -> Map.Map k2 a
 mapKWithV f mp = Map.mapKeys (\ k -> f k (mp Map.! k)) mp
 
 
-plusTuple :: Num a => (a, a) -> (a, a) -> (a, a)
-plusTuple (i, j) (i', j') = (i + i', j + j')
+(^+) :: Num a => (a, a) -> (a, a) -> (a, a)
+(i, j) ^+ (i', j') = (i + i', j + j')
+
+(^*) :: Num a => a -> (a, a) -> (a, a)
+x ^* (i, j) = (x * i, x * j)
+
+(^-) :: Num a => (a, a) -> (a, a) -> (a, a)
+(i, j) ^- (i', j') = (i - i', j - j')
+
+(^$+) :: Num a => (a, a) -> a
+(^$+) (i, j) = i + j
+
+neigh :: Num a => (a, a) -> [(a, a)]
+neigh (x, y) = [(x + 1, y), (x - 1, y),  (x, y + 1), (x, y - 1)]
