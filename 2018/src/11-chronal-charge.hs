@@ -40,7 +40,7 @@ maxFuel gsn =
 compute3x3Fuel :: Integer -> (Integer, Integer) -> Integer
 compute3x3Fuel gsn cell =
   [(i, j) | i <- [0..2], j <- [0..2]]
-   & map (plusTuple cell)
+   & map (^+ cell)
    & map (compute gsn)
    & sum
 

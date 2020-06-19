@@ -14,7 +14,8 @@ executable x1
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
-                       containers
+                       containers,
+                       array
   default-language:    Haskell2010
 
 executable x2
@@ -22,7 +23,8 @@ executable x2
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
-                       containers
+                       containers,
+                       array
   default-language:    Haskell2010
 
 executable x4
@@ -31,7 +33,8 @@ executable x4
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
                        containers,
-                       extra
+                       extra,
+                       array
   default-language:    Haskell2010
 
 executable x5
@@ -39,7 +42,8 @@ executable x5
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
-                       containers
+                       containers,
+                       array
   default-extensions:  TupleSections
   default-language:    Haskell2010
 
@@ -48,7 +52,8 @@ executable x7
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
-                       containers
+                       containers,
+                       array
   default-extensions:  TupleSections
   default-language:    Haskell2010
 
@@ -57,7 +62,8 @@ executable x8
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
-                       containers
+                       containers,
+                       array
   default-extensions:  TupleSections
   default-language:    Haskell2010
 
@@ -66,7 +72,8 @@ executable x9
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
-                       containers
+                       containers,
+                       array
   default-extensions:  TupleSections
   default-language:    Haskell2010
 
@@ -79,7 +86,8 @@ executable x10
                        parallel,
                        split,
                        extra,
-                       ansi-terminal
+                       ansi-terminal,
+                       array
   default-extensions:  TupleSections,
                        ViewPatterns,
                        PatternSynonyms,
@@ -94,7 +102,8 @@ executable x11
   other-modules:       Utils
   build-depends:       base ^>= 4.14,
                        containers,
-                       parallel
+                       parallel,
+                       array
   default-extensions:  TupleSections
   default-language:    Haskell2010
 
@@ -105,7 +114,8 @@ executable x12
   build-depends:       base ^>= 4.14,
                        containers,
                        parallel,
-                       split
+                       split,
+                       array
   default-extensions:  TupleSections,
                        ViewPatterns,
                        PatternSynonyms,
@@ -120,7 +130,24 @@ executable x14
                        containers,
                        parallel,
                        split,
-                       extra
+                       extra,
+                       array
+  default-extensions:  TupleSections,
+                       ViewPatterns,
+                       PatternSynonyms,
+                       LambdaCase
+  default-language:    Haskell2010
+
+executable x18
+  main-is:             18-settlers-of-the-north-pole.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       containers,
+                       parallel,
+                       split,
+                       extra,
+                       array
   default-extensions:  TupleSections,
                        ViewPatterns,
                        PatternSynonyms,
