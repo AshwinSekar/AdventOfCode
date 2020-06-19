@@ -1,23 +1,8 @@
 import Utils
 
-import Control.Monad
-import Control.Parallel.Strategies
-
 import Data.Array.Unboxed
-import Data.Char
-import Data.Foldable
-import Data.Function
-import Data.Functor
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.List
-import Data.List.Split
-import Data.List.Extra hiding (splitOn)
-import Data.Maybe
-
-import Debug.Trace
 
 type Forest = UArray (Int, Int) Char
 type Seen = Map.Map Forest Integer
@@ -26,18 +11,17 @@ main :: IO ()
 main = do
   putStrLn "Input:"
   forest <- parse <$> readLines []
-  let p1 = resourceValue $ step forest Map.empty 10 0
-      p2 = resourceValue $ step forest Map.empty 1000000000 0
-  putStrLn $ "Part 1: " ++ show p1
-  putStrLn $ "Part 2: " ++ show p2
+  putStrLn $ "Part 1: " ++ show (go forest 10)
+  putStrLn $ "Part 2: " ++ show (go forest 1000000000)
+  where go f n = step f Map.empty n 0
 
 parse :: [String] -> Forest
-parse s = listArray ((1, 1), (n, n)) $ join s
+parse s = listArray ((1, 1), (n, n)) $ concat s
   where n = length s
 
-step :: Forest -> Seen -> Integer -> Integer -> Forest
+step :: Forest -> Seen -> Integer -> Integer -> Int
 step f seen n i
-  | n == i = f
+  | n == i = length (filter (== '|') $ elems f) * length (filter (== '#') $ elems f)
   | otherwise = case (i -) <$> Map.lookup f seen of
                   Nothing -> step f' (Map.insert f i seen) n (i + 1)
                   Just c  -> step f' Map.empty (n `rem` c) ((i + 1) `rem` c)
@@ -52,6 +36,3 @@ step' f i c =
   where ns      = map (f !) $ filter (inRange $ bounds f) (neigh' i)
         nTrees  = length $ filter (== '|') ns
         nLumber = length $ filter (== '#') ns
-
-resourceValue :: Forest -> Int
-resourceValue (elems -> f) = length (filter (== '|') f) * length (filter (== '#') f)
