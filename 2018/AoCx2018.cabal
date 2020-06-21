@@ -138,6 +138,17 @@ executable x14
                        LambdaCase
   default-language:    Haskell2010
 
+executable x16
+  main-is:             16-chronal-classification.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       containers,
+                       array,
+                       megaparsec
+  default-language:    Haskell2010
+
+
 executable x18
   main-is:             18-settlers-of-the-north-pole.hs
   hs-source-dirs:      src
