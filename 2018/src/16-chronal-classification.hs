@@ -65,7 +65,6 @@ data Sample = Sample { r :: Registers
 
 main :: IO ()
 main = do
-  putStrLn "Input:"
   input <- readFile "data/16-puzzle-input"
   Right (samples, prog) <- runParserT parser "" input
   let eval r Instr{op,a,b,c} = run (findCodings samples ! op) r a b c
