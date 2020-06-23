@@ -63,15 +63,20 @@ main = do
       r1 = eval prog ip r0
       r0' = Map.fromList $ zip [0..] [1, 0, 0, 0, 0, 0]
       r1' = eval prog ip r0'
-  -- putStrLn $ "Part 1: " ++ show (r1 ! 0)
+  putStrLn $ "Part 1: " ++ show (r1 ! 0)
   putStrLn $ "Part 2: " ++ show (r1' ! 0)
 
 
 eval :: Prog -> Int -> Registers -> Registers
-eval prog ip r = case Map.lookup i prog of
-  Nothing -> r
-  Just Instr{op, a, b, c} -> eval prog ip $ Map.adjust (+1) ip (run op r a b c)
-  where i = trace (show r) $ r ! ip
+eval prog ip r = case (i, Map.lookup i prog) of
+  (_, Nothing) -> r
+  (1, _) -> Map.insert 0 (sumFactors $ r ! 4) r
+  (_, Just Instr{op, a, b, c}) -> eval prog ip $ Map.adjust (+1) ip (run op r a b c)
+  where i = r ! ip
+
+sumFactors :: Int -> Int
+sumFactors n = sum $ filter isFactor [1..n]
+  where isFactor j = n `rem` j == 0
 
 run :: Opcode -> Registers -> Int -> Int -> Int -> Registers
 run ADDR r a b c = Map.insert c (r ! a + r ! b) r
