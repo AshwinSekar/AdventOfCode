@@ -57,6 +57,16 @@ executable x5
   default-extensions:  TupleSections
   default-language:    Haskell2010
 
+executable x6
+  main-is:             6-chronal-coordinates.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base ^>= 4.14,
+                       containers,
+                       array,
+                       megaparsec
+  default-language:    Haskell2010
+
 executable x7
   main-is:             7-the-sum-of-its-parts.hs
   hs-source-dirs:      src
