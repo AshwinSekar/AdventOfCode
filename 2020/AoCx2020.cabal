@@ -1,0 +1,28 @@
+cabal-version:       >=1.10
+
+name:                AoCx2020
+version:             0.1.0.0
+synopsis:            Advent of Code 2020
+description:         Problems from the 2020 Advent of Code completed in haskell. https://adventofcode.com/2020
+author:              Ashwin Sekar
+maintainer:          gaurjas@gmail.com
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+
+executable x1
+  main-is:             1-report-repair.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers
+  default-extensions:  TupleSections
+  default-language:    Haskell2010
+
+executable x2
+  main-is:             2-password-philosophy.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec
+  default-language:    Haskell2010
