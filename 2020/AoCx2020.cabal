@@ -80,3 +80,16 @@ executable x7
 											 keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
+
+executable x8
+  main-is:             8-handheld-halting.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 split,
+											 mtl,
+											 keys
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010
