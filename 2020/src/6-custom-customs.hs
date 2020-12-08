@@ -23,8 +23,8 @@ type Parser = ParsecT Void String IO
 
 main :: IO ()
 main = do
-  input <- readFile "data/6-puzzle-input"
-  let groups = splitWhen (=="") $ lines input
+  input <- getFile "data/6-puzzle-input"
+  let groups = splitWhen (=="") input
       p1 = sum $ map anyYes groups
       p2 = sum $ map allYes groups
   putStrLn $ "Part 1: " ++ show p1

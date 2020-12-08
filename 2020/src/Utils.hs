@@ -2,8 +2,13 @@ module Utils
 ( readLines,
   splitString,
   slices,
-  pairSum
+  pairSum,
+  getFile,
+  parseFile
 ) where
+
+import Data.Void
+import Text.Megaparsec
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -11,6 +16,18 @@ readLines lines = do
   if null line
       then return $ reverse lines
       else readLines (line:lines)
+
+
+getFile :: String -> IO [String]
+getFile file = lines <$> readFile file
+
+parseFile :: String -> ParsecT Void String IO a -> IO a
+parseFile file parser = do
+  input <- readFile file
+  e <- runParserT parser "" input
+  return $ case e of
+    Left x  -> error $ errorBundlePretty x
+    Right x -> x
 
 splitString :: (Char -> Bool) -> String -> [String]
 splitString p s = case dropWhile p s of

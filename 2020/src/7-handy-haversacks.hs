@@ -64,8 +64,7 @@ dfs adj u = do
 
 main :: IO ()
 main = do
-  input <- readFile "data/7-puzzle-input"
-  Right adj <- runParserT parser "" input
+  adj <- parseFile "data/7-puzzle-input" parser
   let p1 = Set.size $ bfs adj Set.empty $ Set.singleton "shiny gold"
       p2 = evalState (dfs adj "shiny gold") Map.empty
   putStrLn $ "Part 1: " ++ show p1
