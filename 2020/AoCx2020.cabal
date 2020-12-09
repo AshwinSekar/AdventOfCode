@@ -56,7 +56,6 @@ executable x5
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
-
 executable x6
   main-is:             6-custom-customs.hs
   hs-source-dirs:      src
@@ -83,6 +82,19 @@ executable x7
 
 executable x8
   main-is:             8-handheld-halting.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 split,
+											 mtl,
+											 keys
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010
+
+executable x9
+  main-is:             9-encoding-error.hs
   hs-source-dirs:      src
   other-modules:       Utils
   build-depends:       base >=4.14 && <4.15,
