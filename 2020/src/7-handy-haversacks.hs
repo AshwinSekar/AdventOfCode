@@ -3,7 +3,6 @@ import Utils
 import Control.Applicative (liftA2)
 import Control.Monad
 import Control.Monad.ST
-import Control.Monad.State
 
 import Data.Char
 import Data.Function ((&))
@@ -52,20 +51,14 @@ bfs adj v f
         f' = Map.keysSet $ Map.filter contains adj
         v' = Set.union v f'
 
-dfs :: Adj -> String -> State (Map.Map String Int) Int
-dfs adj u = do
-  cnts <- get
-  case (Map.lookup u cnts, Map.lookup u adj) of
-    (Just c, _)   -> return c
-    (Nothing, Just (Map.assocs -> bg)) -> do
-      c <- foldlM (\ t (k, v) -> (t + v +) <$> ((*v) <$> dfs adj k)) 0 bg
-      modify (Map.insert u c)
-      return c
+dfs :: Map.Map String Int -> Adj -> Map.Map String Int
+dfs n = Map.map (Map.foldlWithKey (\ a k i -> a + i + i * (n ! k)) 0)
 
 main :: IO ()
 main = do
   adj <- parseFile "data/7-puzzle-input" parser
   let p1 = Set.size $ bfs adj Set.empty $ Set.singleton "shiny gold"
-      p2 = evalState (dfs adj "shiny gold") Map.empty
+      memo = dfs memo adj
+      p2 = memo ! "shiny gold"
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2
