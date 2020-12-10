@@ -4,11 +4,12 @@ module Utils
   slices,
   pairSum,
   getFile,
-  parseFile
+  parseFile,
+  count
 ) where
 
 import Data.Void
-import Text.Megaparsec
+import Text.Megaparsec (ParsecT, runParserT, errorBundlePretty)
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -42,3 +43,6 @@ slices size s = case splitAt size s of
 
 pairSum :: Num a => (a, a) -> a
 pairSum (x, y) = x + y
+
+count :: (a -> Bool) -> [a] -> Int
+count f = length . filter f

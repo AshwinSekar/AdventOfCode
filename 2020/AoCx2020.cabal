@@ -105,3 +105,16 @@ executable x9
 											 keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
+
+executable x10
+  main-is:             10-adapter-array.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 split,
+											 mtl,
+											 keys
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010
