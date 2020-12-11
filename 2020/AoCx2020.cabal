@@ -118,3 +118,16 @@ executable x10
 											 keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
+
+executable x11
+  main-is:             11-seating-system.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 split,
+											 mtl,
+											 keys
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010

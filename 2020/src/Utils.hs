@@ -5,11 +5,20 @@ module Utils
   pairSum,
   getFile,
   parseFile,
-  count
+  count,
+  fourDirs,
+  eightDirs,
+  psum,
+  gridMap
 ) where
 
+import Control.Monad
+import qualified Data.Map as Map
 import Data.Void
 import Text.Megaparsec (ParsecT, runParserT, errorBundlePretty)
+
+fourDirs  = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+eightDirs = [(0, 1), (1, 1), (1, 0), (0, -1), (-1, -1), (-1, 0), (-1, 1), (1, -1)]
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -46,3 +55,9 @@ pairSum (x, y) = x + y
 
 count :: (a -> Bool) -> [a] -> Int
 count f = length . filter f
+
+psum :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
+psum (x, y) (x', y') = (x + x', y + y')
+
+gridMap :: [[a]] -> Map.Map (Integer, Integer) a
+gridMap input = Map.fromList . join $ zipWith (\ i s -> zipWith (\j c -> ((i, j), c) ) [0..] s) [0..] input
