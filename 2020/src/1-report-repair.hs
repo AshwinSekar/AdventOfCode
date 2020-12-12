@@ -13,7 +13,7 @@ main = do
   input <- readLines []
   let expenses = map read input
       sums = liftA2 (,) expenses expenses
-              & map (\p -> (pairSum p, p))
+              & map (\p -> (uncurry (+) p, p))
               & Map.fromList
       (x, y) = sums ! 2020
       s3:_ = filter (\e -> Map.member (2020 - e) sums) expenses

@@ -2,14 +2,15 @@ module Utils
 ( readLines,
   splitString,
   slices,
-  pairSum,
   getFile,
   parseFile,
   count,
   fourDirs,
   eightDirs,
+  dir,
   psum,
-  gridMap
+  gridMap,
+  d2r
 ) where
 
 import Control.Monad
@@ -19,6 +20,11 @@ import Text.Megaparsec (ParsecT, runParserT, errorBundlePretty)
 
 fourDirs  = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 eightDirs = [(0, 1), (1, 1), (1, 0), (0, -1), (-1, -1), (-1, 0), (-1, 1), (1, -1)]
+
+dir "N" = (1, 0)
+dir "E" = (0, 1)
+dir "S" = (-1, 0)
+dir "W" = (0, -1)
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -50,14 +56,15 @@ slices size s = case splitAt size s of
                     (x, []) -> [x]
                     (x, y) -> x : slices size y
 
-pairSum :: Num a => (a, a) -> a
-pairSum (x, y) = x + y
-
-count :: (a -> Bool) -> [a] -> Int
 count f = length . filter f
 
 psum :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 psum (x, y) (x', y') = (x + x', y + y')
 
+pprod :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
+pprod (x, y) (x', y') = (x * x', y * y')
+
 gridMap :: [[a]] -> Map.Map (Integer, Integer) a
 gridMap input = Map.fromList . join $ zipWith (\ i s -> zipWith (\j c -> ((i, j), c) ) [0..] s) [0..] input
+
+d2r theta = pi * theta / 180
