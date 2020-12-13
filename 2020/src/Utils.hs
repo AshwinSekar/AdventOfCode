@@ -10,7 +10,10 @@ module Utils
   dir,
   psum,
   gridMap,
-  d2r
+  d2r,
+  egcd,
+  modInv,
+  crt
 ) where
 
 import Control.Monad
@@ -68,3 +71,26 @@ gridMap :: [[a]] -> Map.Map (Integer, Integer) a
 gridMap input = Map.fromList . join $ zipWith (\ i s -> zipWith (\j c -> ((i, j), c) ) [0..] s) [0..] input
 
 d2r theta = pi * theta / 180
+
+egcd :: Int -> Int -> (Int, Int)
+egcd _ 0 = (1, 0)
+egcd a b = (t, s - q * t)
+  where
+    (s, t) = egcd b r
+    (q, r) = a `quotRem` b
+
+modInv :: Int -> Int -> Either String Int
+modInv a b =
+  case egcd a b of
+    (x, y)
+      | a * x + b * y == 1 -> Right x
+      | otherwise ->
+        Left $ "No modular inverse for " ++ show a ++ " and " ++ show b
+
+crt :: [Int] -> [Int] -> Either String Int
+crt residues modulii =
+  zipWithM modInv crtModulii modulii >>=
+  (Right . (`mod` modPI) . sum . zipWith (*) crtModulii . zipWith (*) residues)
+  where
+    modPI = product modulii
+    crtModulii = (modPI `div`) <$> modulii
