@@ -153,3 +153,14 @@ executable x13
 											 extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
+
+executable x14
+  main-is:             14-docking-data.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010
