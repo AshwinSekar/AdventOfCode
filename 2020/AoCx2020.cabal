@@ -164,3 +164,25 @@ executable x14
 											 extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
+
+executable x15
+  main-is:             15-rambunctious-recitation.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010
+
+executable x16
+  main-is:             16.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010
