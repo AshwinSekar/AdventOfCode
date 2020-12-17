@@ -7,8 +7,12 @@ module Utils
   count,
   fourDirs,
   eightDirs,
+  eightDirs3D,
+  eightDirs4D,
   dir,
   psum,
+  psum3,
+  psum4,
   gridMap,
   d2r,
   egcd,
@@ -23,6 +27,8 @@ import Text.Megaparsec (ParsecT, runParserT, errorBundlePretty)
 
 fourDirs  = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 eightDirs = [(0, 1), (1, 1), (1, 0), (0, -1), (-1, -1), (-1, 0), (-1, 1), (1, -1)]
+eightDirs3D = [(x, y, z) | x <-[-1..1], y <-[-1..1], z <-[-1..1], abs x + abs y + abs z > 0]
+eightDirs4D = [(x, y, z, w) | x <-[-1..1], y <-[-1..1], z <-[-1..1], w <-[-1..1], abs x + abs y + abs z + abs w > 0]
 
 dir "N" = (1, 0)
 dir "E" = (0, 1)
@@ -63,6 +69,11 @@ count f = length . filter f
 
 psum :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 psum (x, y) (x', y') = (x + x', y + y')
+
+
+psum3 :: (Num a, Num b, Num c) => (a, b, c) -> (a, b, c) -> (a, b, c)
+psum3 (x, y, z) (x', y', z') = (x + x', y + y', z + z')
+psum4 (x, y, z, w) (x', y', z', w') = (x + x', y + y', z + z', w + w')
 
 pprod :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 pprod (x, y) (x', y') = (x * x', y * y')

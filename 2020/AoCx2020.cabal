@@ -186,3 +186,14 @@ executable x16
 											 extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
+
+executable x17
+  main-is:             17-conway-cubes.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra
+  default-extensions:  FlexibleInstances
+  default-language:    Haskell2010
