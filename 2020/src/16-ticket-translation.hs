@@ -10,22 +10,20 @@ import qualified Data.Map as Map
 
 import Data.Void
 
-import Text.Megaparsec (ParsecT, runParserT, (<|>), choice, someTill, try, sepBy1, sepEndBy)
-import Text.Megaparsec.Char (space, newline, string, letterChar, char, spaceChar, printChar)
-import Text.Megaparsec.Char.Lexer (decimal, signed)
+import Text.Megaparsec (someTill, some, sepBy1)
+import Text.Megaparsec.Char (printChar)
 
-type Parser = ParsecT Void String IO
 type Rule = ((Int, Int), (Int, Int))
 
 ruleParser :: Parser (String, Rule)
-ruleParser = liftA2 (,) (someTill printChar (char ':'))
-                        (liftA2 (,) (liftA2 (,) (space *> decimal <* char '-') (decimal <* string " or "))
-                                    (liftA2 (,) (decimal <* char '-') decimal))
+ruleParser = liftA2 (,) (someTill printChar (symbol ":"))
+                        (liftA2 (,) (liftA2 (,) (decimal <* symbol "-") (decimal <* symbol "or "))
+                                    (liftA2 (,) (decimal <* symbol "-") decimal))
 
 parser :: Parser (Map.Map String Rule, [Int], [[Int]])
-parser = liftA3 (,,) (Map.fromList <$> ruleParser `sepEndBy` newline)
-                     (string "\nyour ticket:\n" *> (decimal `sepBy1` char ',') <* newline)
-                     (string "\nnearby tickets:\n" *> ((decimal `sepBy1` char ',') `sepEndBy` newline))
+parser = liftA3 (,,) (Map.fromList <$> someTill ruleParser (symbol "your ticket:"))
+                     (decimal `sepBy1` symbol ",")
+                     (symbol "nearby tickets:" *> some (decimal `sepBy1` symbol ","))
 
 main :: IO ()
 main = do

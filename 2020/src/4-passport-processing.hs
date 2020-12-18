@@ -13,10 +13,8 @@ import qualified Data.Set as Set
 
 import Data.Void
 import Text.Megaparsec
-import Text.Megaparsec.Char (spaceChar, newline, string, lowerChar, asciiChar, char)
-import Text.Megaparsec.Char.Lexer (decimal)
+import Text.Megaparsec.Char (spaceChar, newline, lowerChar, asciiChar)
 
-type Parser = ParsecT Void String IO
 type PPort = Map.Map String String
 
 fields :: Set.Set String
@@ -27,15 +25,12 @@ eyeColors = Set.fromList ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
 
 pairParser :: Parser (String, String)
 pairParser = do
-  key <- someTill lowerChar (char ':')
+  key <- someTill lowerChar (symbol ":")
   val <- someTill asciiChar spaceChar
   return (key, val)
 
-pportParser :: Parser PPort
-pportParser = someTill pairParser newline >>= (return . Map.fromList)
-
-parser :: Parser [PPort]
-parser = some pportParser
+parser :: Parser PPort
+parser = someTill pairParser newline >>= (return . Map.fromList)
 
 valid :: PPort -> Bool
 valid (Map.keysSet -> keys) = Set.null $ fields Set.\\ keys
@@ -58,8 +53,7 @@ validField _ _ = False
 
 main :: IO ()
 main = do
-  input <- readFile "data/4-puzzle-input"
-  Right pports <- runParserT parser "" input
+  pports <- parseFile "data/4-puzzle-input" (some parser)
   let p1 = length $ filter valid pports
       p2 = filter valid pports
             & filter (\p -> Map.size (Map.filterWithKey validField p) == 7)

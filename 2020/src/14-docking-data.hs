@@ -8,12 +8,10 @@ import Data.Tuple
 import Data.Tuple.Extra
 
 import Data.Void
-import Text.Megaparsec (ParsecT, runParserT, (<|>), sepEndBy, count, between)
-import Text.Megaparsec.Char (newline, string, alphaNumChar)
-import Text.Megaparsec.Char.Lexer (decimal)
+import Text.Megaparsec ((<|>), count, between, some)
+import Text.Megaparsec.Char (alphaNumChar)
 
-type Parser = ParsecT Void String IO
-data Instr = Mask String | Mem Integer Integer
+data Instr = Mask String | Mem Integer Integer deriving (Show, Eq, Ord)
 
 valMask :: String -> [(Integer, Integer)]
 valMask s = [both ((s&) . bin2Dec) (0, 1)]
@@ -26,10 +24,9 @@ addrMask = foldl gen [(0, 0)]
         gen vs '1' = (\ (o, a) -> (2 * o + 1, 2 * a + 1)) <$> vs
         gen vs 'X' = vs >>= (\ (o, a) -> [(2 * o + 1, 2 * a + 1), (2 * o, 2 * a)])
 
-parser :: Parser [Instr]
-parser = (Mask <$> (string "mask = " *> count 36 alphaNumChar)
-     <|> Mem <$> between (string "mem[") (string "] = ") decimal <*> decimal)
-     `sepEndBy` newline
+parser :: Parser Instr
+parser = Mask <$> (symbol "mask =" *> count 36 (lexeme alphaNumChar))
+     <|> Mem  <$> between (symbol "mem[") (symbol "] =") decimal <*> decimal
 
 run p1 (mem, _) (Mask mask) = (mem, mask & if p1 then valMask else addrMask)
 run p1 (mem, masks) (Mem i x) = (foldl write mem masks, masks)
@@ -38,7 +35,7 @@ run p1 (mem, masks) (Mem i x) = (foldl write mem masks, masks)
 
 main :: IO ()
 main = do
-  prog <- parseFile "data/14-puzzle-input" parser
+  prog <- parseFile "data/14-puzzle-input" (some parser)
   let (p1, p2) = (run True, run False)
                   & both (sum . fst . (\ f -> foldl f(Map.empty, [(0, complement 0)]) prog))
   putStrLn $ "Part 1: " ++ show p1

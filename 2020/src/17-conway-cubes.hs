@@ -7,11 +7,9 @@ import qualified Data.Set as Set
 import Data.Tuple.Extra
 
 import Data.Void
-import Text.Megaparsec (ParsecT, runParserT, (<|>), choice, someTill, try, sepBy1, sepEndBy, many)
-import Text.Megaparsec.Char (space, newline, string, letterChar, char, spaceChar, printChar)
-import Text.Megaparsec.Char.Lexer (decimal, signed)
+import Text.Megaparsec (someTill, many)
+import Text.Megaparsec.Char (newline, printChar)
 
-type Parser = ParsecT Void String IO
 type Grid a = Map.Map a Bool
 
 class Point a where

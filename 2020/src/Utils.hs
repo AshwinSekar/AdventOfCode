@@ -20,6 +20,7 @@ module Utils
   crt,
   lexeme,
   decimal,
+  signed,
   symbol,
   Parser
 ) where
@@ -29,15 +30,18 @@ import qualified Data.Map as Map
 import Data.Void
 import Text.Megaparsec (ParsecT, runParserT, errorBundlePretty)
 import Text.Megaparsec.Char (char, space)
-import qualified Text.Megaparsec.Char.Lexer as L (decimal, lexeme, symbol)
+import qualified Text.Megaparsec.Char.Lexer as L (decimal, lexeme, symbol, signed)
 
 type Parser = ParsecT Void String IO
 
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme space
 
-decimal :: Parser Integer
+decimal :: (Num a) => Parser a
 decimal = lexeme L.decimal
+
+signed :: (Num a) => Parser a
+signed = lexeme $ L.signed space L.decimal
 
 symbol :: String -> Parser String
 symbol = L.symbol space

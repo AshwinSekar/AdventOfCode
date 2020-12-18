@@ -1,37 +1,21 @@
 import Utils
 
-import Control.Applicative (liftA2)
-import Control.Monad
-import Control.Monad.ST
-import Control.Monad.State
-
-import Data.Char
 import Data.Function ((&))
-import Data.Functor
-import Data.List
-import Data.Foldable
-import Data.Map ((!))
 import qualified Data.Map as Map
 import qualified Data.Set as Set
-import Data.Tuple
 
 import Data.Void
-import Text.Megaparsec (ParsecT, runParserT, (<|>), choice, someTill, try, sepBy1, sepEndBy)
-import Text.Megaparsec.Char (space, newline, string, letterChar, char, spaceChar, printChar)
-import Text.Megaparsec.Char.Lexer (decimal, signed)
+import Text.Megaparsec (choice, some)
 
-import Debug.Trace
-
-type Parser = ParsecT Void String IO
 data Instr = Nop Int | Acc Int | Jmp Int
 type Prog = Map.Map Int Instr
 
 parser :: Parser Prog
-parser = Map.fromList . zip [0,1..] <$> instrParser `sepEndBy` newline
+parser = Map.fromList . zip [0,1..] <$> some instrParser
   where instrParser = choice [
-          Nop <$> (string "nop " *> signed space decimal),
-          Acc <$> (string "acc " *> signed space decimal),
-          Jmp <$> (string "jmp " *> signed space decimal)
+          Nop <$> (symbol "nop " *> signed),
+          Acc <$> (symbol "acc " *> signed),
+          Jmp <$> (symbol "jmp " *> signed)
          ]
 
 run :: Set.Set Int -> Int -> Int -> Prog -> (Int, Bool)
