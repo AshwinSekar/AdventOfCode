@@ -17,13 +17,30 @@ module Utils
   d2r,
   egcd,
   modInv,
-  crt
+  crt,
+  lexeme,
+  decimal,
+  symbol,
+  Parser
 ) where
 
 import Control.Monad
 import qualified Data.Map as Map
 import Data.Void
 import Text.Megaparsec (ParsecT, runParserT, errorBundlePretty)
+import Text.Megaparsec.Char (char, space)
+import qualified Text.Megaparsec.Char.Lexer as L (decimal, lexeme, symbol)
+
+type Parser = ParsecT Void String IO
+
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme space
+
+decimal :: Parser Integer
+decimal = lexeme L.decimal
+
+symbol :: String -> Parser String
+symbol = L.symbol space
 
 fourDirs  = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 eightDirs = [(0, 1), (1, 1), (1, 0), (0, -1), (-1, -1), (-1, 0), (-1, 1), (1, -1)]

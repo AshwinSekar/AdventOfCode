@@ -197,3 +197,15 @@ executable x17
 											 extra
   default-extensions:  FlexibleInstances
   default-language:    Haskell2010
+
+executable x18
+  main-is:             18-operation-order.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 parser-combinators,
+											 extra
+  default-extensions:  FlexibleInstances
+  default-language:    Haskell2010
