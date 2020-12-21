@@ -241,5 +241,5 @@ executable x21
                        containers,
                        megaparsec,
 											 extra
-  default-extensions:  FlexibleInstances
+  default-extensions:  ViewPatterns
   default-language:    Haskell2010
