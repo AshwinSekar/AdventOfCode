@@ -210,3 +210,36 @@ executable x18
 											 extra
   default-extensions:  FlexibleInstances
   default-language:    Haskell2010
+
+executable x19
+  main-is:             19-monster-messages.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra
+  default-extensions:  FlexibleInstances
+  default-language:    Haskell2010
+
+executable x20
+  main-is:             20-jurassic-jigsaw.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra
+  default-extensions:  FlexibleInstances
+  default-language:    Haskell2010
+
+executable x21
+  main-is:             21-allergen-assessment.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra
+  default-extensions:  FlexibleInstances
+  default-language:    Haskell2010
