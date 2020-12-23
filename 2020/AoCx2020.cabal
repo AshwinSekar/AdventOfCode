@@ -254,3 +254,15 @@ executable x22
 											 extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
+
+executable x23
+  main-is:             23-crab-cups.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+											 extra,
+                       unordered-containers
+  default-extensions:  ViewPatterns
+  default-language:    Haskell2010
