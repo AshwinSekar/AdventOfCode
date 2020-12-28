@@ -64,7 +64,7 @@ executable x6
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 split
+                       split
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -75,9 +75,9 @@ executable x7
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 split,
-											 mtl,
-											 keys
+                       split,
+                       mtl,
+                       keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -88,9 +88,9 @@ executable x8
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 split,
-											 mtl,
-											 keys
+                       split,
+                       mtl,
+                       keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -101,9 +101,9 @@ executable x9
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 split,
-											 mtl,
-											 keys
+                       split,
+                       mtl,
+                       keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -114,9 +114,9 @@ executable x10
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 split,
-											 mtl,
-											 keys
+                       split,
+                       mtl,
+                       keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -127,9 +127,9 @@ executable x11
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 split,
-											 mtl,
-											 keys
+                       split,
+                       mtl,
+                       keys
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -140,7 +140,7 @@ executable x12
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -151,7 +151,7 @@ executable x13
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -162,7 +162,7 @@ executable x14
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -173,7 +173,7 @@ executable x15
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -184,7 +184,7 @@ executable x16
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -195,7 +195,7 @@ executable x17
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  FlexibleInstances
   default-language:    Haskell2010
 
@@ -206,8 +206,8 @@ executable x18
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 parser-combinators,
-											 extra
+                       parser-combinators,
+                       extra
   default-extensions:  FlexibleInstances
   default-language:    Haskell2010
 
@@ -218,7 +218,7 @@ executable x19
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  FlexibleInstances
   default-language:    Haskell2010
 
@@ -229,7 +229,7 @@ executable x20
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  FlexibleInstances
   default-language:    Haskell2010
 
@@ -240,7 +240,7 @@ executable x21
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -251,7 +251,7 @@ executable x22
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra
+                       extra
   default-extensions:  ViewPatterns
   default-language:    Haskell2010
 
@@ -262,7 +262,19 @@ executable x23
   build-depends:       base >=4.14 && <4.15,
                        containers,
                        megaparsec,
-											 extra,
+                       extra,
                        unordered-containers
   default-extensions:  ViewPatterns
+  default-language:    Haskell2010
+
+executable x24
+  main-is:             24-lobby-layout.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+                       extra,
+                       unordered-containers
+  default-extensions:  TupleSections
   default-language:    Haskell2010

@@ -22,7 +22,8 @@ module Utils
   decimal,
   signed,
   symbol,
-  Parser
+  Parser,
+  xor
 ) where
 
 import Control.Monad
@@ -126,3 +127,6 @@ crt residues modulii =
   where
     modPI = product modulii
     crtModulii = (modPI `div`) <$> modulii
+
+xor :: Bool -> Bool -> Bool
+xor a b = a /= b
