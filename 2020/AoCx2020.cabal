@@ -278,3 +278,15 @@ executable x24
                        unordered-containers
   default-extensions:  TupleSections
   default-language:    Haskell2010
+
+executable x25
+  main-is:             25-combo-breaker.hs
+  hs-source-dirs:      src
+  other-modules:       Utils
+  build-depends:       base >=4.14 && <4.15,
+                       containers,
+                       megaparsec,
+                       extra,
+                       unordered-containers
+  default-extensions:  TupleSections
+  default-language:    Haskell2010
