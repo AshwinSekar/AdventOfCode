@@ -1,18 +1,19 @@
-import Utils
+import           Utils
 
-import Control.Applicative (liftA2, (<|>))
+import           Control.Applicative (liftA2, (<|>))
 
-import Data.Function ((&))
-import qualified Data.Set as Set
-import Data.Map ((!))
-import qualified Data.Map as Map
+import           Data.Function       ((&))
+import           Data.Map            ((!))
+import qualified Data.Map            as Map
+import qualified Data.Set            as Set
 
-import Text.Megaparsec (some)
+import           Text.Megaparsec     (some)
 
 commandParser :: Parser (Int, Int)
-commandParser = (,0) <$> (symbol "forward" >> decimal)
-                <|> (0,) <$> (symbol "down" >> decimal)
-                <|> (0,) <$> (symbol "up" >> (0-) <$> decimal)
+commandParser =
+  (, 0) <$> (symbol "forward" >> decimal) <|>
+  (0, ) <$> (symbol "down" >> decimal) <|>
+  (0, ) <$> (symbol "up" >> (0 -) <$> decimal)
 
 main :: IO ()
 main = do
