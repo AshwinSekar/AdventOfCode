@@ -147,7 +147,7 @@ modInv a b =
 crt :: [Int] -> [Int] -> Either String Int
 crt residues modulii =
   zipWithM modInv crtModulii modulii >>=
-  (Right . (`mod` modPI) . sum . zipWith (*) crtModulii . zipWith (*) residues)
+  Right . (`mod` modPI) . sum . zipWith (*) crtModulii . zipWith (*) residues
   where
     modPI = product modulii
     crtModulii = (modPI `div`) <$> modulii

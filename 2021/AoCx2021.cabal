@@ -25,3 +25,13 @@ executable x2
                         megaparsec
     default-language:   Haskell2010
     default-extensions: TupleSections
+
+executable x3
+    main-is:            3-binary-diagnostic.hs
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        containers,
+                        megaparsec
+    default-language:   Haskell2010
+    default-extensions: TupleSections
