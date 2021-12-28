@@ -35,3 +35,13 @@ executable x3
                         megaparsec
     default-language:   Haskell2010
     default-extensions: TupleSections
+
+executable x6
+    main-is:            6-lanternfish.hs
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        containers,
+                        megaparsec
+    default-language:   Haskell2010
+    default-extensions: TupleSections
