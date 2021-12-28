@@ -45,3 +45,13 @@ executable x6
                         megaparsec
     default-language:   Haskell2010
     default-extensions: TupleSections
+
+executable x7
+    main-is:            7-whales.hs
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        containers,
+                        megaparsec
+    default-language:   Haskell2010
+    default-extensions: TupleSections
