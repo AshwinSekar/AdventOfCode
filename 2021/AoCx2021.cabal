@@ -66,6 +66,16 @@ executable x10
     default-language:   Haskell2010
     default-extensions: TupleSections
 
+executable x11
+    main-is:            11-dumbo-octopus.hs
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        containers,
+                        megaparsec
+    default-language:   Haskell2010
+    default-extensions: TupleSections
+
 executable x13
     main-is:            13-transparent-origami.hs
     hs-source-dirs:     src
