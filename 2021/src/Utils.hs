@@ -4,6 +4,7 @@ module Utils
   , slices
   , getFile
   , parseFile
+  , mcount
   , count
   , fourDirs
   , eightDirs
@@ -110,6 +111,8 @@ slices size s =
     (x, y)  -> x : slices size y
 
 count f = length . filter f
+
+mcount f = Map.size . Map.filter f
 
 psum :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 psum (x, y) (x', y') = (x + x', y + y')
