@@ -105,3 +105,15 @@ executable x14
                         megaparsec
     default-language:   Haskell2010
     default-extensions: TupleSections
+
+executable x15
+    main-is:            15-chiton.hs
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        containers,
+                        megaparsec,
+                        heap
+    default-language:   Haskell2010
+    default-extensions: TupleSections
+                        ViewPatterns
