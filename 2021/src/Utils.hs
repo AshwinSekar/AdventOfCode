@@ -26,6 +26,7 @@ module Utils
   , Parser
   , xor
   , bin2dec
+  , isqrt
   ) where
 
 import           Control.Monad
@@ -160,3 +161,6 @@ xor a b = a /= b
 
 bin2dec :: [Int] -> Int
 bin2dec = foldl (\a b -> 2 * a + b) 0
+
+isqrt :: Int -> Int
+isqrt = floor . sqrt . fromIntegral

@@ -117,3 +117,14 @@ executable x15
     default-language:   Haskell2010
     default-extensions: TupleSections
                         ViewPatterns
+
+executable x17
+    main-is:            17-trickshot.hs
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        containers,
+                        megaparsec
+    default-language:   Haskell2010
+    default-extensions: TupleSections
+
