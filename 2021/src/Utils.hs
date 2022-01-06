@@ -23,6 +23,7 @@ module Utils
   , decimal
   , signed
   , symbol
+  , word
   , Parser
   , xor
   , bin2dec
@@ -33,8 +34,8 @@ import           Control.Monad
 import qualified Data.Map                   as Map
 import           Data.Void
 import           Text.Megaparsec            (ParsecT, errorBundlePretty,
-                                             runParserT)
-import           Text.Megaparsec.Char       (char, space)
+                                             runParserT, some)
+import           Text.Megaparsec.Char       (char, letterChar, space)
 import qualified Text.Megaparsec.Char.Lexer as L (decimal, lexeme, signed,
                                                   symbol)
 
@@ -51,6 +52,9 @@ signed = lexeme $ L.signed space L.decimal
 
 symbol :: String -> Parser String
 symbol = L.symbol space
+
+word :: Parser String
+word = lexeme (some letterChar)
 
 fourDirs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
