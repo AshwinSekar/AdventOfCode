@@ -18,6 +18,7 @@ module Utils
   , d2r
   , egcd
   , modInv
+  , modCeil
   , crt
   , lexeme
   , decimal
@@ -151,6 +152,11 @@ modInv a b =
       | a * x + b * y == 1 -> Right x
       | otherwise ->
         Left $ "No modular inverse for " ++ show a ++ " and " ++ show b
+
+modCeil a n =
+  if a `mod` n == 0
+    then n
+    else a `mod` n
 
 crt :: [Int] -> [Int] -> Either String Int
 crt residues modulii =
