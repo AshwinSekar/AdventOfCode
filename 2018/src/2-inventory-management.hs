@@ -1,8 +1,8 @@
-import Data.List
+import           Data.List
 import qualified Data.Map.Strict as Map
-import Data.Maybe
-import qualified Data.Set as Set
-import Utils
+import           Data.Maybe
+import qualified Data.Set        as Set
+import           Utils
 
 letterCount :: String -> (Int, Int)
 letterCount s =
@@ -12,11 +12,11 @@ letterCount s =
    in (fromEnum $ Map.size twos > 0, fromEnum $ Map.size threes > 0)
 
 withoutOneLists :: [a] -> [[a]]
-withoutOneLists [] = []
-withoutOneLists (x : xs) = xs : map (x :) (withoutOneLists xs)
+withoutOneLists []     = []
+withoutOneLists (x:xs) = xs : map (x :) (withoutOneLists xs)
 
 findDuplicate :: Ord a => [[a]] -> [Set.Set a] -> a
-findDuplicate (words : remaining) sets =
+findDuplicate (words:remaining) sets =
   let inserted = zipWith insertMaybe words sets
       duplicate = find (isJust . fst) inserted
       sets' = map snd inserted
@@ -24,7 +24,10 @@ findDuplicate (words : remaining) sets =
         then fromJust $ fst $ fromJust duplicate
         else findDuplicate remaining sets'
   where
-    insertMaybe w s = if Set.member w s then (Just w, s) else (Nothing, Set.insert w s)
+    insertMaybe w s =
+      if Set.member w s
+        then (Just w, s)
+        else (Nothing, Set.insert w s)
 
 main :: IO ()
 main = do

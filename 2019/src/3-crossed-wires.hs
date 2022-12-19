@@ -1,15 +1,25 @@
-import Control.Applicative
-import Control.Monad
-import Control.Monad.ST
-import Data.Array.ST
-import Data.List
-import Data.Maybe
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.ST
+import           Data.Array.ST
+import           Data.List
+import           Data.Maybe
+import           Debug.Trace
+import           Utils
 
 data WireSegment
-  = Horizontal {y :: Integer, x1 :: Integer, x2 :: Integer, s :: Integer}
-  | Vertical {x :: Integer, y1 :: Integer, y2 :: Integer, s :: Integer}
+  = Horizontal
+      { y  :: Integer
+      , x1 :: Integer
+      , x2 :: Integer
+      , s  :: Integer
+      }
+  | Vertical
+      { x  :: Integer
+      , y1 :: Integer
+      , y2 :: Integer
+      , s  :: Integer
+      }
   deriving (Show, Ord, Eq)
 
 main :: IO ()
@@ -37,13 +47,17 @@ toSegment ('U', d) = Vertical 0 0 d d
 toSegment ('D', d) = Vertical 0 0 (-d) d
 
 segment' :: WireSegment -> WireSegment -> WireSegment
-segment' (Vertical x _ y s) (Horizontal _ _ d s') = Horizontal y x (x + d) (s + s')
-segment' (Horizontal y _ x s) (Vertical _ _ d s') = Vertical x y (y + d) (s + s')
+segment' (Vertical x _ y s) (Horizontal _ _ d s') =
+  Horizontal y x (x + d) (s + s')
+segment' (Horizontal y _ x s) (Vertical _ _ d s') =
+  Vertical x y (y + d) (s + s')
 
-findIntersections :: [WireSegment] -> [WireSegment] -> [(Integer, Integer, Integer, Integer)]
+findIntersections ::
+     [WireSegment] -> [WireSegment] -> [(Integer, Integer, Integer, Integer)]
 findIntersections w1 w2 = catMaybes $ liftM2 findIntersection w1 w2
 
-findIntersection :: WireSegment -> WireSegment -> Maybe (Integer, Integer, Integer, Integer)
+findIntersection ::
+     WireSegment -> WireSegment -> Maybe (Integer, Integer, Integer, Integer)
 findIntersection w@Horizontal {} w'@Vertical {} = findIntersection w' w
 findIntersection (Vertical x y1 y2 s1) (Horizontal y x1 x2 s2) =
   if between x1 x x2 && between y1 y y2

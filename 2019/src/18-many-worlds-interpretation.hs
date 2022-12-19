@@ -1,23 +1,24 @@
-import Control.Applicative
-import Control.Monad
-import Control.Monad.State.Lazy
-import Data.Array
-import Data.Bits
-import Data.Char
-import Data.Function
-import qualified Data.Heap as PQ
-import Data.List
-import qualified Data.Map as Map
-import Data.Maybe
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.State.Lazy
+import           Data.Array
+import           Data.Bits
+import           Data.Char
+import           Data.Function
+import qualified Data.Heap                as PQ
+import           Data.List
+import qualified Data.Map                 as Map
+import           Data.Maybe
+import           Debug.Trace
+import           Utils
 
-data BFSState q = BFSState
-  { pq :: PriorityQueue q,
-    visited :: Map.Map Pos Int,
-    maze :: Maze,
-    nKeys :: Int
-  }
+data BFSState q =
+  BFSState
+    { pq      :: PriorityQueue q
+    , visited :: Map.Map Pos Int
+    , maze    :: Maze
+    , nKeys   :: Int
+    }
 
 type PriorityQueue a = PQ.MinPrioHeap Int a
 
@@ -59,28 +60,24 @@ findShortestPath maze =
 findShortestRobotPath :: Maze -> Maybe Int
 findShortestRobotPath maze =
   let Just start = find isStart $ indices maze
-      maze' =
-        start :
-        findDirs start
-          & map (,'#')
-          & (maze //)
+      maze' = start : findDirs start & map (, '#') & (maze //)
       pq = PQ.singleton (0, (findStarts start, zeroBits))
       v = Map.empty
       k = length $ filter isLower (elems maze')
    in evalState roboBFS $ BFSState pq v maze' k
   where
     findDirs (sy, sx) = [(sy + 1, sx), (sy - 1, sx), (sy, sx + 1), (sy, sx - 1)]
-    findStarts (sy, sx) = [(sy + 1, sx + 1), (sy - 1, sx - 1), (sy - 1, sx + 1), (sy + 1, sx - 1)]
+    findStarts (sy, sx) =
+      [(sy + 1, sx + 1), (sy - 1, sx - 1), (sy - 1, sx + 1), (sy + 1, sx - 1)]
     isStart p = maze ! p == '@'
 
 parseMaze :: [String] -> Maze
 parseMaze inputs =
   let h = length inputs
       w = length $ head inputs
-
-      parse _ _ [] = []
-      parse i j ([] : rs) = parse (i + 1) 0 rs
-      parse i j ((c : cs) : rs) = ((i, j), c) : parse i (j + 1) (cs : rs)
+      parse _ _ []          = []
+      parse i j ([]:rs)     = parse (i + 1) 0 rs
+      parse i j ((c:cs):rs) = ((i, j), c) : parse i (j + 1) (cs : rs)
    in array ((0, 0), (h - 1, w - 1)) $ parse 0 0 inputs
 
 bfs :: VaultState Pos
@@ -103,7 +100,8 @@ bfs' p loc@(pos, k) = do
     (46, True, _) -> updateV loc p >> bfs
     (46, False, _) -> updateV loc p >> addDirs loc p >> bfs
     (35, _, _) -> bfs
-    (c, False, True) -> updateV (pos, withK c) p >> addDirs (pos, withK c) p >> bfs
+    (c, False, True) ->
+      updateV (pos, withK c) p >> addDirs (pos, withK c) p >> bfs
     (c, False, False) ->
       if canPass c
         then updateV loc p >> addDirs loc p >> bfs
@@ -125,7 +123,7 @@ roboBFS = do
 
 roboBFS' :: Int -> Int -> [RoboPos] -> [RoboPos] -> RobotState ()
 roboBFS' p k poss [] = return ()
-roboBFS' p k done (pos : poss') = do
+roboBFS' p k done (pos:poss') = do
   v <- gets visited
   unless (Map.member loc v) $ updateV loc p >> addRoboDirs p others pos k
   roboBFS' p k done' poss'
@@ -144,25 +142,22 @@ addRoboDirs p others (y, x) k = do
   m <- gets maze
   v <- gets visited
   pq <- gets pq
-  map add ds
-    & filter (notWall m)
-    & filter (canOpen m)
-    & filter (notVisited v)
-    & map (pickupKeys m)
-    & foldl (ins p) pq
-    & putPQ
+  map add ds & filter (notWall m) & filter (canOpen m) & filter (notVisited v) &
+    map (pickupKeys m) &
+    foldl (ins p) pq &
+    putPQ
   where
     ds = [(1, 0), (-1, 0), (0, 1), (0, -1)]
     add (i, j) = ((y + i, x + j) : others, k)
-    notWall m (pos : _, _) = m ! pos /= '#'
-    notVisited v (pos : _, k) = not $ Map.member (pos, k) v
+    notWall m (pos:_, _) = m ! pos /= '#'
+    notVisited v (pos:_, k) = not $ Map.member (pos, k) v
 
-canOpen m (pos : _, k) =
+canOpen m (pos:_, k) =
   let status = m ! pos
       c = ord status
    in not (isUpper status) || testBit k (c - 65)
 
-pickupKeys m loc@(pos : poss, k) =
+pickupKeys m loc@(pos:poss, k) =
   let status = m ! pos
       c = ord status
    in if isLower status
@@ -189,9 +184,5 @@ putPQ q = modify (\s -> s {pq = q})
 
 showMaze :: Maze -> Int -> Robots -> String
 showMaze maze p (pos, k) =
-  let maze' =
-        map (,'@') pos
-          & (maze //)
-          & elems
-          & slices 7
+  let maze' = map (, '@') pos & (maze //) & elems & slices 7
    in show p ++ "\nKey: " ++ show k ++ "\n" ++ unlines maze'

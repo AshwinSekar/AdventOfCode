@@ -1,7 +1,7 @@
-import Data.Array.Unboxed
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Utils
+import           Data.Array.Unboxed
+import           Data.Map           (Map)
+import qualified Data.Map           as Map
+import           Utils
 
 type Forest = UArray (Int, Int) Char
 
@@ -23,19 +23,30 @@ parse s = listArray ((1, 1), (n, n)) $ concat s
 
 step :: Forest -> Seen -> Integer -> Integer -> Int
 step f seen n i
-  | n == i = length (filter (== '|') $ elems f) * length (filter (== '#') $ elems f)
-  | otherwise = case (i -) <$> Map.lookup f seen of
+  | n == i =
+    length (filter (== '|') $ elems f) * length (filter (== '#') $ elems f)
+  | otherwise =
+    case (i -) <$> Map.lookup f seen of
       Nothing -> step f' (Map.insert f i seen) n (i + 1)
-      Just c -> step f' Map.empty (n `rem` c) ((i + 1) `rem` c)
+      Just c  -> step f' Map.empty (n `rem` c) ((i + 1) `rem` c)
   where
     f' = mapArrWithI (step' f) f
 
 step' :: Forest -> (Int, Int) -> Char -> Char
 step' f i c =
   case c of
-    '.' -> if nTrees >= 3 then '|' else '.'
-    '#' -> if nTrees >= 1 && nLumber >= 1 then '#' else '.'
-    '|' -> if nLumber >= 3 then '#' else '|'
+    '.' ->
+      if nTrees >= 3
+        then '|'
+        else '.'
+    '#' ->
+      if nTrees >= 1 && nLumber >= 1
+        then '#'
+        else '.'
+    '|' ->
+      if nLumber >= 3
+        then '#'
+        else '|'
   where
     ns = map (f !) $ filter (inRange $ bounds f) (neigh' i)
     nTrees = length $ filter (== '|') ns

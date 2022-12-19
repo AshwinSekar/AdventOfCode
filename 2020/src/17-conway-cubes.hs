@@ -1,12 +1,12 @@
-import Data.Functor ((<&>))
-import Data.Map ((!))
-import qualified Data.Map as Map
-import qualified Data.Set as Set
-import Data.Tuple.Extra
-import Data.Void
-import Text.Megaparsec (many, someTill)
-import Text.Megaparsec.Char (newline, printChar)
-import Utils
+import           Data.Functor         ((<&>))
+import           Data.Map             ((!))
+import qualified Data.Map             as Map
+import qualified Data.Set             as Set
+import           Data.Tuple.Extra
+import           Data.Void
+import           Text.Megaparsec      (many, someTill)
+import           Text.Megaparsec.Char (newline, printChar)
+import           Utils
 
 type Grid a = Map.Map a Bool
 
@@ -36,10 +36,15 @@ boot grid = Map.fromSet active newCoords
 main :: IO ()
 main = do
   (p1, p2) <-
-    parseFile "data/17-puzzle-input" parser
-      <&> gridMap
-      <&> Map.mapKeys (\(x, y) -> (x, y, 0 :: Integer)) &&& Map.mapKeys (\(x, y) -> (x, y, 0 :: Integer, 0 :: Integer))
-      <&> Map.elems . (!! 6) . iterate boot *** Map.elems . (!! 6) . iterate boot
-      <&> both (count id)
+    parseFile "data/17-puzzle-input" parser <&> gridMap <&>
+    Map.mapKeys (\(x, y) -> (x, y, 0 :: Integer)) &&&
+    Map.mapKeys (\(x, y) -> (x, y, 0 :: Integer, 0 :: Integer)) <&>
+    Map.elems .
+    (!! 6) .
+    iterate boot ***
+    Map.elems .
+    (!! 6) .
+    iterate boot <&>
+    both (count id)
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2

@@ -1,9 +1,9 @@
-import Control.Applicative
-import Control.Monad
-import Data.List
-import Data.Tuple.Extra
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Data.List
+import           Data.Tuple.Extra
+import           Debug.Trace
+import           Utils
 
 type MoonState = ([(Int, Int, Int)], [(Int, Int, Int)])
 
@@ -59,13 +59,15 @@ calcA pos (xv, yv, zv) = foldl1' addTuple $ map calcG pos
 
 calcA' pos xs = sum $ map (calcG' xs) pos
 
-calcG' a a' = case compare a a' of
-  LT -> 1
-  EQ -> 0
-  GT -> -1
+calcG' a a' =
+  case compare a a' of
+    LT -> 1
+    EQ -> 0
+    GT -> -1
 
 totalEnergy :: MoonState -> Int
-totalEnergy (pos, vs) = sum $ zipWith energy (map absTuple pos) (map absTuple vs)
+totalEnergy (pos, vs) =
+  sum $ zipWith energy (map absTuple pos) (map absTuple vs)
 
 energy :: (Int, Int, Int) -> (Int, Int, Int) -> Int
 energy (x, y, z) (xv, yv, zv) = (x + y + z) * (xv + yv + zv)
@@ -78,4 +80,6 @@ period pos = 2 * halfP
 
 period' :: [Integer] -> Integer -> ([Integer], [Integer]) -> Integer
 period' oPos x state@(pos, vs) =
-  if all (== 0) vs then x else period' oPos (x + 1) $ step' state
+  if all (== 0) vs
+    then x
+    else period' oPos (x + 1) $ step' state

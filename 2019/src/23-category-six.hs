@@ -1,40 +1,42 @@
-import Control.Applicative
-import Control.Concurrent
-import Control.Monad
-import Control.Monad.ST.Trans
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Lazy
-import Data.Array
-import Data.Array.ST
-import Data.Char
-import Data.Function
-import Data.Functor
-import Data.List
-import qualified Data.Map as Map
-import Data.Maybe
-import Data.Sequence (Seq (..), (|>))
-import qualified Data.Sequence as Seq
-import Debug.Trace
-import System.Console.ANSI
-import System.IO
-import System.Random
-import Utils
+import           Control.Applicative
+import           Control.Concurrent
+import           Control.Monad
+import           Control.Monad.ST.Trans
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.State.Lazy
+import           Data.Array
+import           Data.Array.ST
+import           Data.Char
+import           Data.Function
+import           Data.Functor
+import           Data.List
+import qualified Data.Map                       as Map
+import           Data.Maybe
+import           Data.Sequence                  (Seq (..), (|>))
+import qualified Data.Sequence                  as Seq
+import           Debug.Trace
+import           System.Console.ANSI
+import           System.IO
+import           System.Random
+import           Utils
 
 -- prog, instruction pointer, relative base, inputs
-data Comp s = Comp
-  { ip :: Integer,
-    base :: Integer,
-    prog :: IntProg s,
-    inputs :: Seq.Seq Integer,
-    outputs :: [Integer]
-  }
+data Comp s =
+  Comp
+    { ip      :: Integer
+    , base    :: Integer
+    , prog    :: IntProg s
+    , inputs  :: Seq.Seq Integer
+    , outputs :: [Integer]
+    }
 
-data Network s = Network
-  { idleCnt :: Integer,
-    pkt :: Maybe (Integer, Integer),
-    lastPkt :: Maybe (Integer, Integer),
-    comps :: Map.Map Integer (Comp s)
-  }
+data Network s =
+  Network
+    { idleCnt :: Integer
+    , pkt     :: Maybe (Integer, Integer)
+    , lastPkt :: Maybe (Integer, Integer)
+    , comps   :: Map.Map Integer (Comp s)
+    }
 
 type NetworkState s a = StateT (Network s) (STT s IO) a
 
@@ -48,10 +50,7 @@ liftIO :: IO a -> NetworkState s a
 liftIO = lift . lift
 
 getsC :: Integer -> (Comp s -> a) -> NetworkState s a
-getsC c f =
-  gets comps
-    <&> (Map.! c)
-    <&> f
+getsC c f = gets comps <&> (Map.! c) <&> f
 
 adjC :: Integer -> (Comp s -> Comp s) -> NetworkState s ()
 adjC c f = modify (\s -> s {comps = Map.adjust f c (comps s)})
@@ -92,16 +91,10 @@ savePacketNAT (x, y) = do
 
 checkIdle :: NetworkState s ()
 checkIdle = do
-  nIdle <-
-    gets comps
-      <&> Map.filter (Seq.null . inputs)
-      <&> Map.size
+  nIdle <- gets comps <&> Map.filter (Seq.null . inputs) <&> Map.size
   when (nIdle == 50) incIdleCnt
 
-shift offset instr =
-  10 ^ (offset + 1)
-    & (instr `div`)
-    & (`rem` 10)
+shift offset instr = 10 ^ (offset + 1) & (instr `div`) & (`rem` 10)
 
 getPmode c offset = do
   i <- getsC c ip
@@ -109,30 +102,35 @@ getPmode c offset = do
   lift $ shift offset <$> readArray p i
 
 {-# ANN readParam "Hlint: ignore Reduce duplication" #-}
+
 readParam :: Integer -> Integer -> NetworkState s Integer
 readParam c offset = do
   i <- getsC c ip
   bp <- getsC c base
   prog <- getsC c prog
   pmode <- getPmode c offset
-  lift $ case pmode of
-    0 -> readArray prog >=> readArray prog $ i + offset
-    1 -> readArray prog (i + offset)
-    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+  lift $
+    case pmode of
+      0 -> readArray prog >=> readArray prog $ i + offset
+      1 -> readArray prog (i + offset)
+      2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: Integer -> NetworkState s (Integer, Integer)
 readParams c = liftM2 (,) (readParam c 1) (readParam c 2)
 
 {-# ANN writeParam "Hlint: ignore Reduce duplication" #-}
+
 writeParam :: Integer -> Integer -> Integer -> NetworkState s ()
 writeParam c offset val = do
   i <- getsC c ip
   bp <- getsC c base
   prog <- getsC c prog
   pmode <- getPmode c offset
-  m <- lift $ case pmode of
-    0 -> readArray prog (i + offset)
-    2 -> (+ bp) <$> readArray prog (i + offset)
+  m <-
+    lift $
+    case pmode of
+      0 -> readArray prog (i + offset)
+      2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog m val)
 
 main :: IO ()
@@ -147,10 +145,10 @@ runNetwork :: [Integer] -> STT s IO ()
 runNetwork intprog = do
   progs <- replicateM 50 $ newArray (0, 4096) 0
   forM_ progs (\p -> zipWithM_ (writeArray p) [0 ..] intprog)
-  zipWith (\i p -> (i, Comp 0 0 p (Seq.singleton i) [])) [0 .. 49] progs
-    & Map.fromList
-    & Network 0 Nothing Nothing
-    & evalStateT runNetwork'
+  zipWith (\i p -> (i, Comp 0 0 p (Seq.singleton i) [])) [0 .. 49] progs &
+    Map.fromList &
+    Network 0 Nothing Nothing &
+    evalStateT runNetwork'
 
 runNetwork' :: NetworkState s ()
 runNetwork' = do
@@ -166,7 +164,7 @@ release = do
   pkt <- gets pkt
   ins <- getsC 0 inputs
   case pkt of
-    Nothing -> liftIO $ putStrLn "No packet to release"
+    Nothing     -> liftIO $ putStrLn "No packet to release"
     Just (x, y) -> putInputs 0 (ins |> x |> y) >> checkDone
 
 checkDone :: NetworkState s ()
@@ -178,7 +176,7 @@ checkDone = do
     then liftIO $ putStrLn ("Part 2: " ++ show y)
     else putLastPkt pkt >> runNetwork'
   where
-    yEq y Nothing = False
+    yEq y Nothing        = False
     yEq y (Just (_, y')) = y == y'
 
 step :: Integer -> NetworkState s ()
@@ -187,15 +185,15 @@ step c = do
   prog <- getsC c prog
   instr <- lift $ readArray prog i
   case instr `rem` 100 of
-    1 -> plusMult (+) c
-    2 -> plusMult (*) c
-    3 -> input c
-    4 -> output c
-    5 -> jump (/=) c
-    6 -> jump (==) c
-    7 -> cond (<) c
-    8 -> cond (==) c
-    9 -> adjBase c
+    1  -> plusMult (+) c
+    2  -> plusMult (*) c
+    3  -> input c
+    4  -> output c
+    5  -> jump (/=) c
+    6  -> jump (==) c
+    7  -> cond (<) c
+    8  -> cond (==) c
+    9  -> adjBase c
     99 -> return ()
 
 plusMult :: IntOp -> Integer -> NetworkState s ()
@@ -206,7 +204,7 @@ plusMult op c = do
 
 getInput :: Seq.Seq Integer -> NetworkState s (Seq.Seq Integer)
 getInput Seq.Empty = return $ -1 :<| Seq.Empty
-getInput inputs = return inputs
+getInput inputs    = return inputs
 
 input :: Integer -> NetworkState s ()
 input c = do
@@ -228,13 +226,19 @@ jump :: IntCond -> Integer -> NetworkState s ()
 jump p c = do
   i <- getsC c ip
   (a, b) <- readParams c
-  let i' = if p a 0 then b else i + 3
+  let i' =
+        if p a 0
+          then b
+          else i + 3
   putIP c i'
 
 cond :: IntCond -> Integer -> NetworkState s ()
 cond p c = do
   (a, b) <- readParams c
-  let val = if p a b then 1 else 0
+  let val =
+        if p a b
+          then 1
+          else 0
   writeParam c 3 val
   incIP c 4
 

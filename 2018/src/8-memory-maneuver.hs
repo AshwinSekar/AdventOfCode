@@ -1,13 +1,15 @@
-import Control.Monad
-import Data.Char
-import Data.Foldable
-import Data.Function
-import Data.List
-import Data.Maybe
-import Debug.Trace
-import Utils
+import           Control.Monad
+import           Data.Char
+import           Data.Foldable
+import           Data.Function
+import           Data.List
+import           Data.Maybe
+import           Debug.Trace
+import           Utils
 
-data Node = Node [Node] [Int] deriving (Show)
+data Node =
+  Node [Node] [Int]
+  deriving (Show)
 
 main :: IO ()
 main = do
@@ -26,7 +28,7 @@ sumMetadata nodes = s
 
 sumMetadata' :: ([Int], Integer) -> ([Int], Integer)
 sumMetadata' ([], s) = ([], s)
-sumMetadata' (n : m : ns, s) = (ns'', s'')
+sumMetadata' (n:m:ns, s) = (ns'', s'')
   where
     (ns', s') = iterate sumMetadata' (ns, s) & (!! n)
     (meta, ns'') = splitAt m ns'
@@ -36,7 +38,7 @@ parse :: [Int] -> Node
 parse ins = head . fst $ parse' ([], ins)
 
 parse' :: ([Node], [Int]) -> ([Node], [Int])
-parse' (ns, n : m : is) = (s : ns, is'')
+parse' (ns, n:m:is) = (s : ns, is'')
   where
     (c, is') = iterate parse' ([], is) & (!! n)
     (meta, is'') = splitAt m is'
@@ -44,11 +46,6 @@ parse' (ns, n : m : is) = (s : ns, is'')
 
 value :: Node -> Integer
 value (Node [] m) = sum (map fromIntegral m)
-value (Node c m) =
-  map (mlen -) m
-    & filter (>= 0)
-    & map (c !!)
-    & map value
-    & sum
+value (Node c m) = map (mlen -) m & filter (>= 0) & map (c !!) & map value & sum
   where
     mlen = length c

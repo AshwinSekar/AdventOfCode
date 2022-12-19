@@ -1,9 +1,8 @@
 module Utils
-  ( readLines,
-    splitString,
-    slices,
-  )
-where
+  ( readLines
+  , splitString
+  , slices
+  ) where
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -13,13 +12,14 @@ readLines lines = do
     else readLines (line : lines)
 
 splitString :: (Char -> Bool) -> String -> [String]
-splitString p s = case dropWhile p s of
-  "" -> []
-  s' -> w : splitString p s''
-    where
-      (w, s'') = break p s'
+splitString p s =
+  case dropWhile p s of
+    "" -> []
+    s' -> w : splitString p s''
+      where (w, s'') = break p s'
 
 slices :: Int -> [a] -> [[a]]
-slices size s = case splitAt size s of
-  (x, []) -> [x]
-  (x, y) -> x : slices size y
+slices size s =
+  case splitAt size s of
+    (x, []) -> [x]
+    (x, y)  -> x : slices size y

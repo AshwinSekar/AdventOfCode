@@ -1,18 +1,19 @@
-import Control.Applicative
-import Control.Monad
-import Control.Monad.ST
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Lazy
-import Data.Array.ST
-import Data.List
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.ST
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.State.Lazy
+import           Data.Array.ST
+import           Data.List
+import           Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState = ProgState
-  { ip :: Integer,
-    base :: Integer,
-    inputs :: [Integer]
-  }
+data ProgState =
+  ProgState
+    { ip     :: Integer
+    , base   :: Integer
+    , inputs :: [Integer]
+    }
   deriving (Show)
 
 type IntProg s = STArray s Integer Integer
@@ -47,15 +48,15 @@ runProgram' prog = do
   i <- gets ip
   instr <- lift $ readArray prog i
   case instr `rem` 100 of
-    1 -> plusMult prog (+)
-    2 -> plusMult prog (*)
-    3 -> input prog
-    4 -> output prog
-    5 -> jump prog (/=)
-    6 -> jump prog (==)
-    7 -> cond prog (<)
-    8 -> cond prog (==)
-    9 -> adjBase prog
+    1  -> plusMult prog (+)
+    2  -> plusMult prog (*)
+    3  -> input prog
+    4  -> output prog
+    5  -> jump prog (/=)
+    6  -> jump prog (==)
+    7  -> cond prog (<)
+    8  -> cond prog (==)
+    9  -> adjBase prog
     99 -> lift $ return []
 
 shift offset instr = (instr `div` place) `rem` 10
@@ -68,28 +69,33 @@ getPmode prog offset = do
   lift $ shift offset <$> readArray prog i
 
 {-# ANN readParam "Hlint: ignore Reduce duplication" #-}
+
 readParam :: IntProg s -> Integer -> StateT ProgState (ST s) Integer
 readParam prog offset = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  lift $ case pmode of
-    0 -> readArray prog >=> readArray prog $ i + offset
-    1 -> readArray prog (i + offset)
-    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+  lift $
+    case pmode of
+      0 -> readArray prog >=> readArray prog $ i + offset
+      1 -> readArray prog (i + offset)
+      2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT ProgState (ST s) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
 
 {-# ANN writeParam "Hlint: ignore Reduce duplication" #-}
+
 writeParam :: IntProg s -> Integer -> Integer -> StateT ProgState (ST s) ()
 writeParam prog offset val = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  c <- lift $ case pmode of
-    0 -> readArray prog (i + offset)
-    2 -> (+ bp) <$> readArray prog (i + offset)
+  c <-
+    lift $
+    case pmode of
+      0 -> readArray prog (i + offset)
+      2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
 putIP i = modify (\s -> s {ip = i})
@@ -107,7 +113,7 @@ plusMult prog op = do
 
 input :: IntProg s -> StateWithOutputs s
 input prog = do
-  (x : xs) <- gets inputs
+  (x:xs) <- gets inputs
   writeParam prog 1 x
   putInput xs
   gets ip >>= putIP . (+ 2)
@@ -123,14 +129,20 @@ jump :: IntProg s -> IntCond -> StateWithOutputs s
 jump prog p = do
   i <- gets ip
   (a, b) <- readParams prog
-  let i' = if p a 0 then b else i + 3
+  let i' =
+        if p a 0
+          then b
+          else i + 3
   putIP i'
   runProgram' prog
 
 cond :: IntProg s -> IntCond -> StateWithOutputs s
 cond prog p = do
   (a, b) <- readParams prog
-  let val = if p a b then 1 else 0
+  let val =
+        if p a b
+          then 1
+          else 0
   writeParam prog 3 val
   gets ip >>= putIP . (+ 4)
   runProgram' prog

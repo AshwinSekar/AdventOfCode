@@ -1,11 +1,13 @@
-import Control.Applicative
-import Control.Monad
-import Data.List
-import qualified Data.Map as Map
-import qualified Data.Set as Set
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Data.List
+import qualified Data.Map            as Map
+import qualified Data.Set            as Set
+import           Utils
 
-data Angle = ATan Int Int deriving (Eq, Show, Read)
+data Angle =
+  ATan Int Int
+  deriving (Eq, Show, Read)
 
 main :: IO ()
 main = do

@@ -1,13 +1,13 @@
 import qualified Data.Set as Set
-import Utils
+import           Utils
 
 parseStr :: String -> Integer
-parseStr (y : ys)
+parseStr (y:ys)
   | y == '+' = read ys
   | otherwise = read (y : ys)
 
 findDup :: [Integer] -> Set.Set Integer -> Integer
-findDup (x : xs) s =
+findDup (x:xs) s =
   if Set.member x s
     then x
     else findDup xs (Set.insert x s)

@@ -1,12 +1,12 @@
-import Control.Applicative
-import Control.Monad
-import Control.Monad.State.Lazy
-import Data.List
-import qualified Data.Map as Map
-import Data.Ratio
-import Data.Tuple.Extra
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.State.Lazy
+import           Data.List
+import qualified Data.Map                 as Map
+import           Data.Ratio
+import           Data.Tuple.Extra
+import           Debug.Trace
+import           Utils
 
 type Edges = Map.Map String [(String, (Integer, Integer))] -- u -> [(vi, (xi, yi))] where each xi vi = yi u + ...
 
@@ -40,7 +40,9 @@ parse s =
       (v, x) = splitRule $ drop 2 r
    in map (\(u, y) -> (u, [(v, (x, y))])) ings'
   where
-    splitRule t = let [c, r] = words t in (r, read c)
+    splitRule t =
+      let [c, r] = words t
+       in (r, read c)
 
 topSort :: Edges -> State ChemicalState ()
 topSort edges =
@@ -48,15 +50,13 @@ topSort edges =
       dfs s = do
         visited <- gets fst3
         case (Map.member s visited, edges Map.!? s) of
-          (True, _) -> return ()
-          (_, Nothing) -> addTop s
+          (True, _)        -> return ()
+          (_, Nothing)     -> addTop s
           (_, Just edges') -> mapM_ (dfs . fst) edges' >> visit s >> addTop s
-
       visit :: String -> State ChemicalState ()
       visit s = do
         (visited, x, top) <- get
         put (Map.insert s 0 visited, x, top)
-
       addTop :: String -> State ChemicalState ()
       addTop s = do
         (visited, x, top) <- get
@@ -69,17 +69,17 @@ computeQuantity edges s = do
   let computeEdgeQ (v, (x, y)) = ceiling (fromIntegral vq / fromIntegral x) * y
         where
           vq = quantities Map.! v
-
       computeEdgeQ' (v, (x, y)) = vq * (y % x)
         where
           vq = quantitiesR Map.! v
-
-      q = case edges Map.!? s of
-        Nothing -> 1 -- Fuel
-        Just edges' -> sum $ map computeEdgeQ edges'
-      q' = case edges Map.!? s of
-        Nothing -> 1 % 1 -- Fuel
-        Just edges' -> sum $ map computeEdgeQ' edges'
+      q =
+        case edges Map.!? s of
+          Nothing     -> 1 -- Fuel
+          Just edges' -> sum $ map computeEdgeQ edges'
+      q' =
+        case edges Map.!? s of
+          Nothing     -> 1 % 1 -- Fuel
+          Just edges' -> sum $ map computeEdgeQ' edges'
   put (Map.insert s q quantities, Map.insert s q' quantitiesR, top)
 
 -- type Edges = Map.Map String [(String, (Integer, Integer))] -- u -> [(vi, (xi, yi))] where each xi vi = yi u + ...

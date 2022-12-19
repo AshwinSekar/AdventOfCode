@@ -1,4 +1,4 @@
-import Utils
+import           Utils
 
 computeRecursiveFuel :: Int -> Int
 computeRecursiveFuel fuel

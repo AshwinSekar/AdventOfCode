@@ -1,14 +1,14 @@
-import Control.Applicative
-import Control.Monad
-import Data.Array
-import Data.Char
-import Data.Function
-import Data.List
-import qualified Data.Map as Map
-import Data.Maybe
-import qualified Data.Set as Set
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Data.Array
+import           Data.Char
+import           Data.Function
+import           Data.List
+import qualified Data.Map            as Map
+import           Data.Maybe
+import qualified Data.Set            as Set
+import           Debug.Trace
+import           Utils
 
 type Bugs = Map.Map (Int, Int) Int
 
@@ -20,20 +20,14 @@ main = do
       bugs' = parseBug input
       l = listArray ((0, 0), (4, 4)) bugs
       p1 = rating $ findRepeat l (Set.singleton l)
-      p2 =
-        iterate step bugs'
-          & (!! 200)
-          & sum
+      p2 = iterate step bugs' & (!! 200) & sum
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2
 
 parseBug :: [String] -> Bugs
-parseBug inputs =
-  concat inputs
-    & foldl build (1, empty)
-    & snd
+parseBug inputs = concat inputs & foldl build (1, empty) & snd
   where
-    build (13, bugs) _ = (14, bugs)
+    build (13, bugs) _  = (14, bugs)
     build (i, bugs) '.' = (i + 1, Map.insert (i, 0) 0 bugs)
     build (i, bugs) '#' = (i + 1, Map.insert (i, 0) 1 bugs)
     empty = Map.fromList [((i, z), 0) | i <- grid, z <- [-100 .. 100]]
@@ -49,19 +43,18 @@ transform' bugs (i, z) 1
   | adjs bugs (i, z) == 1 = 1
   | otherwise = 0
 
-adjs bugs (i, z) =
-  adjs' bugs (i, z)
-    & mapMaybe (`Map.lookup` bugs)
-    & sum
+adjs bugs (i, z) = adjs' bugs (i, z) & mapMaybe (`Map.lookup` bugs) & sum
 
 adjs' bugs (1, z) = [(8, z - 1), (12, z - 1), (2, z), (6, z)]
 adjs' bugs (5, z) = [(8, z - 1), (14, z - 1), (4, z), (10, z)]
 adjs' bugs (21, z) = [(12, z - 1), (18, z - 1), (16, z), (22, z)]
 adjs' bugs (25, z) = [(14, z - 1), (18, z - 1), (20, z), (24, z)]
-adjs' bugs (8, z) = [(3, z), (7, z), (9, z)] ++ map (,z + 1) [1 .. 5]
-adjs' bugs (12, z) = [(7, z), (11, z), (17, z)] ++ map (\i -> (5 * i + 1, z + 1)) [0 .. 4]
-adjs' bugs (14, z) = [(9, z), (15, z), (19, z)] ++ map (\i -> (5 * i, z + 1)) [1 .. 5]
-adjs' bugs (18, z) = [(17, z), (19, z), (23, z)] ++ map (,z + 1) [21 .. 25]
+adjs' bugs (8, z) = [(3, z), (7, z), (9, z)] ++ map (, z + 1) [1 .. 5]
+adjs' bugs (12, z) =
+  [(7, z), (11, z), (17, z)] ++ map (\i -> (5 * i + 1, z + 1)) [0 .. 4]
+adjs' bugs (14, z) =
+  [(9, z), (15, z), (19, z)] ++ map (\i -> (5 * i, z + 1)) [1 .. 5]
+adjs' bugs (18, z) = [(17, z), (19, z), (23, z)] ++ map (, z + 1) [21 .. 25]
 adjs' bugs (i, z)
   | i < 5 = [(8, z - 1), (i - 1, z), (i + 1, z), (i + 5, z)]
   | i > 21 = [(18, z - 1), (i - 1, z), (i + 1, z), (i - 5, z)]
@@ -93,17 +86,18 @@ transform l p =
     (0, 1) -> 1
     (0, 2) -> 1
     (1, 1) -> 1
-    _ -> 0
+    _      -> 0
 
 adjBugs l (i, j) = length $ filter (== 1) (map bug dirs)
   where
     dirs = [(i, j - 1), (i, j + 1), (i + 1, j), (i - 1, j)]
-    bug p = case p of
-      (-1, _) -> 0
-      (5, _) -> 0
-      (_, -1) -> 0
-      (_, 5) -> 0
-      _ -> l ! p
+    bug p =
+      case p of
+        (-1, _) -> 0
+        (5, _)  -> 0
+        (_, -1) -> 0
+        (_, 5)  -> 0
+        _       -> l ! p
 
 showBugs l = unlines $ slices 5 (map iParse (elems l))
   where

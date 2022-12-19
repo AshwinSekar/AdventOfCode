@@ -1,19 +1,19 @@
-import Control.Monad
-import Control.Parallel.Strategies
-import Data.Char
-import Data.Foldable
-import Data.Function
-import Data.Functor
-import Data.List
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Data.Sequence (Seq (..), (<|), (><), (|>))
-import qualified Data.Sequence as Seq
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Tuple.Extra
-import Debug.Trace
-import Utils
+import           Control.Monad
+import           Control.Parallel.Strategies
+import           Data.Char
+import           Data.Foldable
+import           Data.Function
+import           Data.Functor
+import           Data.List
+import           Data.Map                    (Map)
+import qualified Data.Map                    as Map
+import           Data.Sequence               (Seq (..), (<|), (><), (|>))
+import qualified Data.Sequence               as Seq
+import           Data.Set                    (Set)
+import qualified Data.Set                    as Set
+import           Data.Tuple.Extra
+import           Debug.Trace
+import           Utils
 
 type Plants = (Integer, [Bool])
 
@@ -23,15 +23,8 @@ main :: IO ()
 main = do
   putStrLn "Input:"
   inp <- getLine
-  let p1 =
-        genSeq
-          & drop (read inp)
-          & take 10
-          <&> intToDigit
-      Just p2 =
-        genSeq
-          & tails
-          & findIndex (isPrefixOf (map digitToInt inp))
+  let p1 = genSeq & drop (read inp) & take 10 <&> intToDigit
+      Just p2 = genSeq & tails & findIndex (isPrefixOf (map digitToInt inp))
   putStrLn $ "Part 1: " ++ p1
   putStrLn $ "Part 2: " ++ show p2
 

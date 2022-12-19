@@ -1,10 +1,10 @@
-import Control.Applicative (liftA2, (<|>))
-import Data.Function ((&))
-import Data.Map ((!))
-import qualified Data.Map as Map
-import qualified Data.Set as Set
-import Text.Megaparsec (sepBy1)
-import Utils
+import           Control.Applicative (liftA2, (<|>))
+import           Data.Function       ((&))
+import           Data.Map            ((!))
+import qualified Data.Map            as Map
+import qualified Data.Set            as Set
+import           Text.Megaparsec     (sepBy1)
+import           Utils
 
 main :: IO ()
 main = do
@@ -18,7 +18,7 @@ main = do
         case (l < r, d < l && d < r) of
           (_, True) -> calc x
           (True, _) -> go f (x - 1)
-          _ -> go f (x + 1)
+          _         -> go f (x + 1)
         where
           calc y = sum $ map (f y) crabs
           [l, d, r] = calc <$> [x - 1, x, x + 1]

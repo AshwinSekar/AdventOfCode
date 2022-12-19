@@ -1,49 +1,44 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-import Control.Monad
-import Data.Bits
-import Data.Function
-import Data.Functor
-import Data.List hiding ((\\))
-import Data.Map (Map, (!))
-import qualified Data.Map as Map
-import Data.Set (Set, (\\))
-import qualified Data.Set as Set
-import Data.Void
-import Debug.Trace
-import System.IO
-import Text.Megaparsec
-import Text.Megaparsec.Char (newline, space, string)
-import Text.Megaparsec.Char.Lexer (decimal, signed)
-import Utils
+import           Control.Monad
+import           Data.Bits
+import           Data.Function
+import           Data.Functor
+import           Data.List                  hiding ((\\))
+import           Data.Map                   (Map, (!))
+import qualified Data.Map                   as Map
+import           Data.Set                   (Set, (\\))
+import qualified Data.Set                   as Set
+import           Data.Void
+import           Debug.Trace
+import           System.IO
+import           Text.Megaparsec
+import           Text.Megaparsec.Char       (newline, space, string)
+import           Text.Megaparsec.Char.Lexer (decimal, signed)
+import           Utils
 
 type Parser = ParsecT Void String IO
 
 sampleParser :: Parser Sample
 sampleParser =
-  Sample
-    <$> between (string "Before: [") (string "]") regParser <* newline
-    <*> instrParser <* newline
-    <*> between (string "After:  [") (string "]") regParser <* newline
+  Sample <$> between (string "Before: [") (string "]") regParser <* newline <*>
+  instrParser <*
+  newline <*>
+  between (string "After:  [") (string "]") regParser <*
+  newline
 
 regParser :: Parser Registers
-regParser =
-  decimal `sepEndBy` string ", "
-    <&> zip [0 ..]
-    <&> Map.fromList
+regParser = decimal `sepEndBy` string ", " <&> zip [0 ..] <&> Map.fromList
 
 instrParser :: Parser Instr
 instrParser =
-  Instr
-    <$> decimal <* space
-    <*> decimal <* space
-    <*> decimal <* space
-    <*> decimal
+  Instr <$> decimal <* space <*> decimal <* space <*> decimal <* space <*>
+  decimal
 
 parser :: Parser ([Sample], [Instr])
 parser =
-  (,) <$> sampleParser `sepEndBy1` newline <* many newline
-    <*> instrParser `sepEndBy1` newline
+  (,) <$> sampleParser `sepEndBy1` newline <* many newline <*>
+  instrParser `sepEndBy1` newline
 
 type Registers = Map Int Int
 
@@ -66,19 +61,21 @@ data Opcode
   | EQRR
   deriving (Enum, Bounded, Eq, Show, Ord)
 
-data Instr = Instr
-  { op :: Int,
-    a :: Int,
-    b :: Int,
-    c :: Int
-  }
+data Instr =
+  Instr
+    { op :: Int
+    , a  :: Int
+    , b  :: Int
+    , c  :: Int
+    }
   deriving (Show, Eq)
 
-data Sample = Sample
-  { r :: Registers,
-    instr :: Instr,
-    r' :: Registers
-  }
+data Sample =
+  Sample
+    { r     :: Registers
+    , instr :: Instr
+    , r'    :: Registers
+    }
   deriving (Show, Eq)
 
 main :: IO ()
@@ -91,10 +88,7 @@ main = do
   putStrLn $ "Part 2: " ++ show (r' ! 0)
 
 valid :: [Sample] -> Int -> Int
-valid samples n =
-  map behave samples
-    & filter ((>= n) . length)
-    & length
+valid samples n = map behave samples & filter ((>= n) . length) & length
 
 behave :: Sample -> [Opcode]
 behave Sample {r, instr, r'} = do
@@ -137,4 +131,7 @@ run EQRI r a b c = Map.insert c (test $ r ! a == b) r
 run EQRR r a b c = Map.insert c (test $ r ! a == r ! b) r
 
 test :: Bool -> Int
-test b = if b then 1 else 0
+test b =
+  if b
+    then 1
+    else 0

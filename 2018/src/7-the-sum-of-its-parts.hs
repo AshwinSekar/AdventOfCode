@@ -1,13 +1,13 @@
-import Control.Monad
-import Data.Char
-import Data.Foldable
-import Data.Function
-import Data.List
-import qualified Data.Map as Map
-import Data.Maybe
-import qualified Data.Set as Set
-import Debug.Trace
-import Utils
+import           Control.Monad
+import           Data.Char
+import           Data.Foldable
+import           Data.Function
+import           Data.List
+import qualified Data.Map      as Map
+import           Data.Maybe
+import qualified Data.Set      as Set
+import           Debug.Trace
+import           Utils
 
 -- Time, Step -> Steps before
 type AdjList = Map.Map (Int, Char) (Set.Set Char)
@@ -29,9 +29,7 @@ main = do
 
 parse :: [String] -> AdjList
 parse inputs =
-  map edges inputs
-    & (++ map sources inputs)
-    & Map.fromListWith Set.union
+  map edges inputs & (++ map sources inputs) & Map.fromListWith Set.union
   where
     edges s = ((0, s !! 36), Set.singleton $ s !! 5)
     sources s = ((0, s !! 5), Set.empty)
@@ -42,7 +40,7 @@ topSort adj = reverse $ kahns adj []
 kahns :: AdjList -> String -> String
 kahns adj l =
   case Map.lookupMin sources of
-    Nothing -> l
+    Nothing          -> l
     Just ((_, u), _) -> kahns (del u) (u : l)
   where
     sources = Map.filter Set.null adj
@@ -51,7 +49,7 @@ kahns adj l =
 parSort :: AdjList -> Int -> Int
 parSort adj nWorkers = parKahns adj workers []
   where
-    workers = Set.fromList $ map (0,) [1 .. nWorkers]
+    workers = Set.fromList $ map (0, ) [1 .. nWorkers]
 
 parKahns :: AdjList -> Workers -> String -> Int
 parKahns adj w l =
@@ -66,9 +64,9 @@ parKahns adj w l =
     time u = ord u - ord 'A' + 61
 
 upd :: Char -> Int -> Int -> AdjList -> AdjList
-upd u t t' adj =
-  Map.delete (t, u) adj
-    & mapKWithV upd'
-    & Map.map (Set.delete u)
+upd u t t' adj = Map.delete (t, u) adj & mapKWithV upd' & Map.map (Set.delete u)
   where
-    upd' (ts, k) vs = if Set.member u vs then (max ts t', k) else (ts, k)
+    upd' (ts, k) vs =
+      if Set.member u vs
+        then (max ts t', k)
+        else (ts, k)

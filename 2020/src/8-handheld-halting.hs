@@ -1,29 +1,32 @@
-import Data.Function ((&))
-import qualified Data.Map as Map
-import qualified Data.Set as Set
-import Data.Void
-import Text.Megaparsec (choice, some)
-import Utils
+import           Data.Function   ((&))
+import qualified Data.Map        as Map
+import qualified Data.Set        as Set
+import           Data.Void
+import           Text.Megaparsec (choice, some)
+import           Utils
 
-data Instr = Nop Int | Acc Int | Jmp Int
+data Instr
+  = Nop Int
+  | Acc Int
+  | Jmp Int
 
 type Prog = Map.Map Int Instr
 
 parser :: Parser Prog
-parser = Map.fromList . zip [0, 1 ..] <$> some instrParser
+parser = Map.fromList . zip [0,1 ..] <$> some instrParser
   where
     instrParser =
       choice
-        [ Nop <$> (symbol "nop " *> signed),
-          Acc <$> (symbol "acc " *> signed),
-          Jmp <$> (symbol "jmp " *> signed)
+        [ Nop <$> (symbol "nop " *> signed)
+        , Acc <$> (symbol "acc " *> signed)
+        , Jmp <$> (symbol "jmp " *> signed)
         ]
 
 run :: Set.Set Int -> Int -> Int -> Prog -> (Int, Bool)
 run v i a prog =
   case (Set.member i v, Map.lookup i prog) of
-    (True, _) -> (a, False)
-    (_, Nothing) -> (a, True)
+    (True, _)         -> (a, False)
+    (_, Nothing)      -> (a, True)
     (_, Just (Nop _)) -> run v' (i + 1) a prog
     (_, Just (Acc x)) -> run v' (i + 1) (a + x) prog
     (_, Just (Jmp x)) -> run v' (i + x) a prog
@@ -32,14 +35,12 @@ run v i a prog =
 
 terminate :: (Prog -> (Int, Bool)) -> Prog -> (Int, Bool)
 terminate eval prog =
-  map (\j -> eval $ Map.adjust adj j prog) [0 .. n]
-    & filter snd
-    & head
+  map (\j -> eval $ Map.adjust adj j prog) [0 .. n] & filter snd & head
   where
     n = Map.size prog - 1
     adj (Nop x) = Jmp x
     adj (Jmp x) = Nop x
-    adj x = x
+    adj x       = x
 
 main :: IO ()
 main = do

@@ -1,31 +1,28 @@
-import Control.Monad.Combinators.Expr
-import Data.Void
-import Text.Megaparsec (ParsecT, between, some, (<|>))
-import Utils
+import           Control.Monad.Combinators.Expr
+import           Data.Void
+import           Text.Megaparsec                (ParsecT, between, some, (<|>))
+import           Utils
 
-data AST = Int Integer | Sum AST AST | Prod AST AST deriving (Show, Eq, Ord)
+data AST
+  = Int Integer
+  | Sum AST AST
+  | Prod AST AST
+  deriving (Show, Eq, Ord)
 
 paren :: Parser AST -> Parser AST
 paren = between (symbol "(") (symbol ")")
 
-ops =
-  [ [ InfixL $ Prod <$ symbol "*",
-      InfixL $ Sum <$ symbol "+"
-    ]
-  ]
+ops = [[InfixL $ Prod <$ symbol "*", InfixL $ Sum <$ symbol "+"]]
 
-ops' =
-  [ [InfixL $ Sum <$ symbol "+"],
-    [InfixL $ Prod <$ symbol "*"]
-  ]
+ops' = [[InfixL $ Sum <$ symbol "+"], [InfixL $ Prod <$ symbol "*"]]
 
 ast = makeExprParser (Int <$> decimal <|> paren ast) ops
 
 ast' = makeExprParser (Int <$> decimal <|> paren ast') ops'
 
 eval :: AST -> Integer
-eval (Int i) = i
-eval (Sum l r) = eval l + eval r
+eval (Int i)    = i
+eval (Sum l r)  = eval l + eval r
 eval (Prod l r) = eval l * eval r
 
 main :: IO ()

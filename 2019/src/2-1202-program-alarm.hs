@@ -1,9 +1,9 @@
-import Control.Applicative
-import Control.Monad
-import Control.Monad.ST
-import Data.Array.ST
-import Data.List
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.ST
+import           Data.Array.ST
+import           Data.List
+import           Utils
 
 main :: IO ()
 main = do
@@ -12,7 +12,9 @@ main = do
   let inputs = splitString (== ',') input
       intprog = map read inputs
       p1 = runST $ runProgram intprog (12, 2)
-      results = map (\x -> (x, runST $ runProgram intprog x)) $ liftA2 (,) [0 .. 99] [0 .. 99]
+      results =
+        map (\x -> (x, runST $ runProgram intprog x)) $
+        liftA2 (,) [0 .. 99] [0 .. 99]
       Just ((noun, verb), _) = find ((== 19690720) . snd) results
       p2 = 100 * noun + verb
   putStrLn $ "Part 1: " ++ show p1
@@ -35,8 +37,9 @@ runProgram' prog i = do
     a <- readArray prog =<< readArray prog (i + 1)
     b <- readArray prog =<< readArray prog (i + 2)
     p3 <- readArray prog (i + 3)
-    let op = case opcode of
-          1 -> (+)
-          2 -> (*)
+    let op =
+          case opcode of
+            1 -> (+)
+            2 -> (*)
     writeArray prog p3 $ a `op` b
     runProgram' prog (i + 4)

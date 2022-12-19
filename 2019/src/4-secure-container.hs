@@ -1,6 +1,6 @@
-import Control.Applicative
-import Data.List
-import Utils
+import           Control.Applicative
+import           Data.List
+import           Utils
 
 main :: IO ()
 main = do

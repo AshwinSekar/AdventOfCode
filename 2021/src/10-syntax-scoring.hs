@@ -1,10 +1,10 @@
-import Data.Function ((&))
-import Data.List (sort)
-import Data.Map ((!))
-import qualified Data.Map as Map
-import Data.Maybe (mapMaybe)
-import qualified Data.Set as Set
-import Utils
+import           Data.Function ((&))
+import           Data.List     (sort)
+import           Data.Map      ((!))
+import qualified Data.Map      as Map
+import           Data.Maybe    (mapMaybe)
+import qualified Data.Set      as Set
+import           Utils
 
 main :: IO ()
 main = do
@@ -17,11 +17,11 @@ main = do
 
 go :: String -> String -> Maybe Int
 go _ [] = Nothing
-go a ('(' : xs) = go (')' : a) xs
-go a ('[' : xs) = go (']' : a) xs
-go a ('{' : xs) = go ('}' : a) xs
-go a ('<' : xs) = go ('>' : a) xs
-go (x : xs) (y : ys) =
+go a ('(':xs) = go (')' : a) xs
+go a ('[':xs) = go (']' : a) xs
+go a ('{':xs) = go ('}' : a) xs
+go a ('<':xs) = go ('>' : a) xs
+go (x:xs) (y:ys) =
   if y == x
     then go xs ys
     else Just (score y)
@@ -34,11 +34,11 @@ score '>' = 25137
 
 go' :: String -> String -> Maybe Int
 go' a [] = Just $ foldl (\s c -> s * 5 + score' c) 0 a
-go' a ('(' : xs) = go' (')' : a) xs
-go' a ('[' : xs) = go' (']' : a) xs
-go' a ('{' : xs) = go' ('}' : a) xs
-go' a ('<' : xs) = go' ('>' : a) xs
-go' (x : xs) (y : ys) =
+go' a ('(':xs) = go' (')' : a) xs
+go' a ('[':xs) = go' (']' : a) xs
+go' a ('{':xs) = go' ('}' : a) xs
+go' a ('<':xs) = go' ('>' : a) xs
+go' (x:xs) (y:ys) =
   if y == x
     then go' xs ys
     else Nothing

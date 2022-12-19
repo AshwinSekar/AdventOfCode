@@ -1,8 +1,8 @@
-import Control.Applicative
-import Control.Monad
-import Data.List
-import System.IO
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Data.List
+import           System.IO
+import           Utils
 
 main :: IO ()
 main = do
@@ -35,4 +35,4 @@ part2 dim input =
 
 combine :: Char -> Char -> Char
 combine '2' c = c
-combine c _ = c
+combine c _   = c

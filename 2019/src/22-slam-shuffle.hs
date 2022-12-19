@@ -1,11 +1,15 @@
-import Control.Applicative
-import Control.Monad
-import Data.Char
-import Data.List
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Data.Char
+import           Data.List
+import           Debug.Trace
+import           Utils
 
-data Technique = NewStack | Cut Integer | Deal Integer deriving (Show)
+data Technique
+  = NewStack
+  | Cut Integer
+  | Deal Integer
+  deriving (Show)
 
 type Deck = [Integer]
 
@@ -27,7 +31,7 @@ parse "deal into new stack" = NewStack
 parse s =
   let (s', digits) = break isDigit' s
    in case stripPrefix "cut" s' of
-        Just _ -> Cut $ read digits
+        Just _  -> Cut $ read digits
         Nothing -> Deal $ read digits
   where
     isDigit' d = isDigit d || d == '-'
@@ -36,7 +40,9 @@ shuffleNaive :: Deck -> Technique -> Deck
 shuffleNaive deck NewStack = reverse deck
 shuffleNaive deck (Deal n) = deal n deck
 shuffleNaive deck (Cut n)
-  | n >= 0 = let (a, b) = splitAt (fromIntegral n) deck in b ++ a
+  | n >= 0 =
+    let (a, b) = splitAt (fromIntegral n) deck
+     in b ++ a
   | n < 0 = shuffleNaive deck $ Cut (fromIntegral (length deck) + n)
 
 deal :: Integer -> [Integer] -> [Integer]
@@ -46,7 +52,12 @@ deal n deck =
       indexD = tail $ scanl deal' (-n, 0) deck
    in map snd $ sort indexD
 
-shuffle :: [Technique] -> Integer -> Integer -> (Integer, Integer) -> (Integer, Integer)
+shuffle ::
+     [Technique]
+  -> Integer
+  -> Integer
+  -> (Integer, Integer)
+  -> (Integer, Integer)
 shuffle techniques d n deck = ((s * (1 - m') * inv (1 - m + d) d) `rem` d, m')
   where
     (s, m) = foldl' (shuffle' d) deck techniques
@@ -55,7 +66,7 @@ shuffle techniques d n deck = ((s * (1 - m') * inv (1 - m + d) d) `rem` d, m')
 shuffle' :: Integer -> (Integer, Integer) -> Technique -> (Integer, Integer)
 shuffle' d (s, m) NewStack = ((s + (d - 1) * m) `rem` d, -m)
 shuffle' d (s, m) (Deal n) = (s, (m * inv n d) `rem` d)
-shuffle' d (s, m) (Cut n) = ((s + m * (n + d)) `rem` d, m)
+shuffle' d (s, m) (Cut n)  = ((s + m * (n + d)) `rem` d, m)
 
 inv n d = (fst (eGCD n d) + d) `rem` d
 

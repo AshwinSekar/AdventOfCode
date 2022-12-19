@@ -1,12 +1,12 @@
-import Control.Applicative
-import Control.Monad
-import Control.Monad.ST
-import Control.Monad.State.Lazy
-import Data.List
-import qualified Data.Map as Map
-import Data.Maybe
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.ST
+import           Control.Monad.State.Lazy
+import           Data.List
+import qualified Data.Map                 as Map
+import           Data.Maybe
+import           Debug.Trace
+import           Utils
 
 type PlanetState a = State (Map.Map String Int) a
 
@@ -21,7 +21,9 @@ main = do
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2
   where
-    split s = let [a, b] = splitString (== ')') s in (b, a)
+    split s =
+      let [a, b] = splitString (== ')') s
+       in (b, a)
 
 totalOrbit :: Map.Map String String -> Int
 totalOrbit adjList = sum orbits
@@ -49,8 +51,11 @@ totalTransfers adjList =
       (you, san) = (dropWhile (/= uYou) aYou, dropWhile (/= uSan) aSan)
    in (length you + length san) - 2
   where
-    meq a b = if a == b then Nothing else Just (a, b)
+    meq a b =
+      if a == b
+        then Nothing
+        else Just (a, b)
 
 ancestors :: Map.Map String String -> String -> [String]
 ancestors adjList "COM" = ["COM"]
-ancestors adjList x = x : ancestors adjList (adjList Map.! x)
+ancestors adjList x     = x : ancestors adjList (adjList Map.! x)

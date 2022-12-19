@@ -1,11 +1,11 @@
-import Control.Applicative (liftA2, (<|>))
-import Data.Bifunctor (first, second)
-import Data.Function ((&))
-import Data.Map ((!))
-import qualified Data.Map as Map
-import qualified Data.Set as Set
-import Text.Megaparsec (some)
-import Utils
+import           Control.Applicative (liftA2, (<|>))
+import           Data.Bifunctor      (first, second)
+import           Data.Function       ((&))
+import           Data.Map            ((!))
+import qualified Data.Map            as Map
+import qualified Data.Set            as Set
+import           Text.Megaparsec     (some)
+import           Utils
 
 coordsParser :: Parser (Set.Set (Int, Int))
 coordsParser =
@@ -13,8 +13,8 @@ coordsParser =
 
 foldParser :: Parser (Int, Int)
 foldParser =
-  symbol "fold along"
-    >> (0,) <$> (symbol "y=" >> decimal) <|> (,0) <$> (symbol "x=" >> decimal)
+  symbol "fold along" >>
+  (0, ) <$> (symbol "y=" >> decimal) <|> (, 0) <$> (symbol "x=" >> decimal)
 
 main :: IO ()
 main = do
@@ -37,13 +37,11 @@ fold' l d =
 visualize :: Int -> Int -> Set.Set (Int, Int) -> [String]
 visualize maxx maxy coords =
   map
-    ( \y ->
-        map
-          ( \x ->
-              if (x, y) `Set.member` coords
-                then '⬛'
-                else '⬜'
-          )
-          [0 .. maxx]
-    )
+    (\y ->
+       map
+         (\x ->
+            if (x, y) `Set.member` coords
+              then '⬛'
+              else '⬜')
+         [0 .. maxx])
     [0 .. maxy]

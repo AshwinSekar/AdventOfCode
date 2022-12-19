@@ -1,14 +1,15 @@
-import Control.Applicative (liftA2)
-import Control.Monad
-import Data.Functor
-import Data.Map ((!))
-import qualified Data.Map as Map
-import qualified Data.Set as Set
-import Data.Tuple
-import Data.Void
-import Text.Megaparsec (choice, sepBy1, sepEndBy, someTill, try, (<|>))
-import Text.Megaparsec.Char (letterChar, spaceChar)
-import Utils
+import           Control.Applicative  (liftA2)
+import           Control.Monad
+import           Data.Functor
+import           Data.Map             ((!))
+import qualified Data.Map             as Map
+import qualified Data.Set             as Set
+import           Data.Tuple
+import           Data.Void
+import           Text.Megaparsec      (choice, sepBy1, sepEndBy, someTill, try,
+                                       (<|>))
+import           Text.Megaparsec.Char (letterChar, spaceChar)
+import           Utils
 
 type Adj = Map.Map String (Map.Map String Int)
 
@@ -16,22 +17,21 @@ letterSpace = letterChar <|> spaceChar
 
 valueParser :: Parser (String, Int)
 valueParser =
-  swap
-    <$> choice
-      [ try $ liftA2 (,) decimal (someTill letterSpace (symbol " bags")),
-        liftA2 (,) decimal (someTill letterSpace (symbol " bag"))
-      ]
+  swap <$>
+  choice
+    [ try $ liftA2 (,) decimal (someTill letterSpace (symbol " bags"))
+    , liftA2 (,) decimal (someTill letterSpace (symbol " bag"))
+    ]
 
 ruleParser :: Parser (String, Map.Map String Int)
 ruleParser =
   liftA2
     (,)
     (someTill letterSpace (symbol " bags contain"))
-    ( choice
-        [ try $ Map.fromList <$> valueParser `sepBy1` symbol ",",
-          symbol "no other bags" $> Map.empty
-        ]
-    )
+    (choice
+       [ try $ Map.fromList <$> valueParser `sepBy1` symbol ","
+       , symbol "no other bags" $> Map.empty
+       ])
 
 parser :: Parser Adj
 parser = Map.fromList <$> ruleParser `sepEndBy` symbol "."

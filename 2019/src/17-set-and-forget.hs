@@ -1,27 +1,28 @@
-import Control.Applicative
-import Control.Concurrent
-import Control.Monad
-import Control.Monad.ST.Trans
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Lazy
-import Data.Array
-import Data.Array.ST
-import Data.Char
-import Data.List
-import Data.Maybe
-import Debug.Trace
-import System.Console.ANSI
-import System.IO
-import System.Random
-import Utils
+import           Control.Applicative
+import           Control.Concurrent
+import           Control.Monad
+import           Control.Monad.ST.Trans
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.State.Lazy
+import           Data.Array
+import           Data.Array.ST
+import           Data.Char
+import           Data.List
+import           Data.Maybe
+import           Debug.Trace
+import           System.Console.ANSI
+import           System.IO
+import           System.Random
+import           Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState s = ProgState
-  { ip :: Integer,
-    base :: Integer,
-    inputs :: [Int],
-    outputs :: [Int]
-  }
+data ProgState s =
+  ProgState
+    { ip      :: Integer
+    , base    :: Integer
+    , inputs  :: [Int]
+    , outputs :: [Int]
+    }
 
 type IntProg s = STArray s Integer Integer
 
@@ -49,9 +50,10 @@ main = do
   putStrLn path''
   void $ runRobot intprog True
 
-compress s = case head s of
-  'x' -> show (length s) ++ "-"
-  a -> a : "-"
+compress s =
+  case head s of
+    'x' -> show (length s) ++ "-"
+    a   -> a : "-"
 
 runRobot :: [Integer] -> Bool -> IO String
 runRobot prog t = do
@@ -77,7 +79,9 @@ findInt arr (i, j) =
   let dirs = [(-1, 0), (1, 0), (0, 1), (0, -1), (0, 0)]
       surround = map (sc arr (i, j)) dirs
       scaffolds = filter (== 35) surround
-   in if length scaffolds == 5 then Just ((i - 1) * (j - 1)) else Nothing
+   in if length scaffolds == 5
+        then Just ((i - 1) * (j - 1))
+        else Nothing
 
 sc arr (i, j) (y, x) =
   let (i', j') = (y + i, x + j)
@@ -103,17 +107,17 @@ path' arr pos dir =
         (_, 35, _) -> 'x' : path' arr (pos `tplus` dir) dir
         (35, _, _) -> 'l' : path' arr pos l
         (_, _, 35) -> 'r' : path' arr pos r
-        _ -> []
+        _          -> []
 
 (y, x) `tplus` (y', x') = (y + y', x + x')
 
 turnR (-1, 0) = (0, 1)
-turnR (0, 1) = (1, 0)
-turnR (1, 0) = (0, -1)
+turnR (0, 1)  = (1, 0)
+turnR (1, 0)  = (0, -1)
 turnR (0, -1) = (-1, 0)
 
-turnL (0, 1) = (-1, 0)
-turnL (1, 0) = (0, 1)
+turnL (0, 1)  = (-1, 0)
+turnL (1, 0)  = (0, 1)
 turnL (0, -1) = (1, 0)
 turnL (-1, 0) = (0, -1)
 
@@ -131,15 +135,15 @@ runProgram' prog = do
   i <- gets ip
   instr <- lift $ readArray prog i
   case instr `rem` 100 of
-    1 -> plusMult prog (+)
-    2 -> plusMult prog (*)
-    3 -> input prog
-    4 -> output prog
-    5 -> jump prog (/=)
-    6 -> jump prog (==)
-    7 -> cond prog (<)
-    8 -> cond prog (==)
-    9 -> adjBase prog
+    1  -> plusMult prog (+)
+    2  -> plusMult prog (*)
+    3  -> input prog
+    4  -> output prog
+    5  -> jump prog (/=)
+    6  -> jump prog (==)
+    7  -> cond prog (<)
+    8  -> cond prog (==)
+    9  -> adjBase prog
     99 -> return ()
 
 shift offset instr = (instr `div` place) `rem` 10
@@ -152,28 +156,34 @@ getPmode prog offset = do
   lift $ shift offset <$> readArray prog i
 
 {-# ANN readParam "Hlint: ignore Reduce duplication" #-}
+
 readParam :: IntProg s -> Integer -> StateT (ProgState s) (STT s IO) Integer
 readParam prog offset = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  lift $ case pmode of
-    0 -> readArray prog >=> readArray prog $ i + offset
-    1 -> readArray prog (i + offset)
-    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+  lift $
+    case pmode of
+      0 -> readArray prog >=> readArray prog $ i + offset
+      1 -> readArray prog (i + offset)
+      2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT (ProgState s) (STT s IO) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
 
 {-# ANN writeParam "Hlint: ignore Reduce duplication" #-}
-writeParam :: IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
+
+writeParam ::
+     IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
 writeParam prog offset val = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  c <- lift $ case pmode of
-    0 -> readArray prog (i + offset)
-    2 -> (+ bp) <$> readArray prog (i + offset)
+  c <-
+    lift $
+    case pmode of
+      0 -> readArray prog (i + offset)
+      2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
 putIP i = modify (\s -> s {ip = i})
@@ -192,7 +202,7 @@ plusMult prog op = do
   runProgram' prog
 
 getInput :: [Int] -> StateT (ProgState s) (STT s IO) [Int]
-getInput (x : xs) = return $ x : xs
+getInput (x:xs) = return $ x : xs
 getInput [] = do
   inputs <- liftIO $ readLines []
   let withNLine = map (\s -> s ++ [chr 10]) inputs
@@ -202,7 +212,7 @@ getInput [] = do
 
 input :: IntProg s -> GameState s
 input prog = do
-  m : ins <- getInput =<< gets inputs
+  m:ins <- getInput =<< gets inputs
   writeParam prog 1 (fromIntegral m)
   putInputs ins
   gets ip >>= putIP . (+ 2)
@@ -222,14 +232,20 @@ jump :: IntProg s -> IntCond -> GameState s
 jump prog p = do
   i <- gets ip
   (a, b) <- readParams prog
-  let i' = if p a 0 then b else i + 3
+  let i' =
+        if p a 0
+          then b
+          else i + 3
   putIP i'
   runProgram' prog
 
 cond :: IntProg s -> IntCond -> GameState s
 cond prog p = do
   (a, b) <- readParams prog
-  let val = if p a b then 1 else 0
+  let val =
+        if p a b
+          then 1
+          else 0
   writeParam prog 3 val
   gets ip >>= putIP . (+ 4)
   runProgram' prog

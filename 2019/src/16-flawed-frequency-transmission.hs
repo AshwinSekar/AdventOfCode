@@ -1,9 +1,9 @@
-import Control.Applicative
-import Control.Monad
-import Data.Char
-import Data.List
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Data.Char
+import           Data.List
+import           Debug.Trace
+import           Utils
 
 main :: IO ()
 main = do

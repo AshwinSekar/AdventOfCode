@@ -1,37 +1,39 @@
-import Control.Applicative
-import Control.Concurrent
-import Control.Monad
-import Control.Monad.ST.Trans
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Lazy
-import Data.Array.ST
-import qualified Data.Heap as PQ
-import Data.List
-import qualified Data.Map.Lazy as Map
-import Data.Maybe
-import Debug.Trace
-import System.Console.ANSI
-import System.IO
-import System.Random
-import Utils
+import           Control.Applicative
+import           Control.Concurrent
+import           Control.Monad
+import           Control.Monad.ST.Trans
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.State.Lazy
+import           Data.Array.ST
+import qualified Data.Heap                      as PQ
+import           Data.List
+import qualified Data.Map.Lazy                  as Map
+import           Data.Maybe
+import           Debug.Trace
+import           System.Console.ANSI
+import           System.IO
+import           System.Random
+import           Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState s = ProgState
-  { ip :: Integer,
-    base :: Integer,
-    mov :: Integer,
-    dir :: Integer,
-    pos :: (Int, Int),
-    grid :: STArray s (Int, Int) (Maybe Integer),
-    inputF :: InputF s,
-    oxy :: Maybe (Int, Int)
-  }
+data ProgState s =
+  ProgState
+    { ip     :: Integer
+    , base   :: Integer
+    , mov    :: Integer
+    , dir    :: Integer
+    , pos    :: (Int, Int)
+    , grid   :: STArray s (Int, Int) (Maybe Integer)
+    , inputF :: InputF s
+    , oxy    :: Maybe (Int, Int)
+    }
 
-data BFSState s = BFSState
-  { maze :: STArray s (Int, Int) (Maybe Integer),
-    pq :: PriorityQueue,
-    visited :: Map.Map (Int, Int) Int
-  }
+data BFSState s =
+  BFSState
+    { maze    :: STArray s (Int, Int) (Maybe Integer)
+    , pq      :: PriorityQueue
+    , visited :: Map.Map (Int, Int) Int
+    }
 
 type IntProg s = STArray s Integer Integer
 
@@ -72,7 +74,7 @@ bfs' :: FloodState s
 bfs' = do
   pq <- gets pq
   case PQ.view pq of
-    Nothing -> return ()
+    Nothing              -> return ()
     Just ((p, pos), pq') -> putPQ pq' >> bfs'' p pos
 
 bfs'' :: Int -> (Int, Int) -> FloodState s
@@ -82,8 +84,8 @@ bfs'' p pos = do
   status <- lift $ readArray g pos
   case (status, Map.member pos v) of
     (Just 0, _) -> bfs'
-    (_, True) -> updateV pos p >> bfs'
-    (_, False) -> updateV pos p >> addDirs pos p >> bfs'
+    (_, True)   -> updateV pos p >> bfs'
+    (_, False)  -> updateV pos p >> addDirs pos p >> bfs'
 
 updateV :: (Int, Int) -> Int -> FloodState s
 updateV pos p = do
@@ -173,15 +175,15 @@ runProgram' prog = do
   i <- gets ip
   instr <- lift $ readArray prog i
   case instr `rem` 100 of
-    1 -> plusMult prog (+)
-    2 -> plusMult prog (*)
-    3 -> input prog
-    4 -> output prog
-    5 -> jump prog (/=)
-    6 -> jump prog (==)
-    7 -> cond prog (<)
-    8 -> cond prog (==)
-    9 -> adjBase prog
+    1  -> plusMult prog (+)
+    2  -> plusMult prog (*)
+    3  -> input prog
+    4  -> output prog
+    5  -> jump prog (/=)
+    6  -> jump prog (==)
+    7  -> cond prog (<)
+    8  -> cond prog (==)
+    9  -> adjBase prog
     99 -> return ()
 
 shift offset instr = (instr `div` place) `rem` 10
@@ -194,28 +196,34 @@ getPmode prog offset = do
   lift $ shift offset <$> readArray prog i
 
 {-# ANN readParam "Hlint: ignore Reduce duplication" #-}
+
 readParam :: IntProg s -> Integer -> StateT (ProgState s) (STT s IO) Integer
 readParam prog offset = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  lift $ case pmode of
-    0 -> readArray prog >=> readArray prog $ i + offset
-    1 -> readArray prog (i + offset)
-    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+  lift $
+    case pmode of
+      0 -> readArray prog >=> readArray prog $ i + offset
+      1 -> readArray prog (i + offset)
+      2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT (ProgState s) (STT s IO) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
 
 {-# ANN writeParam "Hlint: ignore Reduce duplication" #-}
-writeParam :: IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
+
+writeParam ::
+     IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
 writeParam prog offset val = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  c <- lift $ case pmode of
-    0 -> readArray prog (i + offset)
-    2 -> (+ bp) <$> readArray prog (i + offset)
+  c <-
+    lift $
+    case pmode of
+      0 -> readArray prog (i + offset)
+      2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
 putIP i = modify (\s -> s {ip = i})
@@ -246,7 +254,7 @@ getAi = do
   s <- lift $ readArray g (applyDir p m)
   case s of
     Just 0 -> newDir (turnR d) -- we found a wall
-    _ -> putDir m >> newDir (turnR m) -- no wall, keep going
+    _      -> putDir m >> newDir (turnR m) -- no wall, keep going
 
 newDir :: Integer -> InputF s
 newDir d = do
@@ -287,14 +295,20 @@ jump :: IntProg s -> IntCond -> MazeState s
 jump prog p = do
   i <- gets ip
   (a, b) <- readParams prog
-  let i' = if p a 0 then b else i + 3
+  let i' =
+        if p a 0
+          then b
+          else i + 3
   putIP i'
   runProgram' prog
 
 cond :: IntProg s -> IntCond -> MazeState s
 cond prog p = do
   (a, b) <- readParams prog
-  let val = if p a b then 1 else 0
+  let val =
+        if p a b
+          then 1
+          else 0
   writeParam prog 3 val
   gets ip >>= putIP . (+ 4)
   runProgram' prog

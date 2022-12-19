@@ -1,27 +1,28 @@
-import Control.Applicative
-import Control.Concurrent
-import Control.Monad
-import Control.Monad.ST.Trans
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Lazy
-import Data.Array.ST
-import Data.List
-import Data.Maybe
-import Debug.Trace
-import System.Console.ANSI
-import System.IO
-import Utils
+import           Control.Applicative
+import           Control.Concurrent
+import           Control.Monad
+import           Control.Monad.ST.Trans
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.State.Lazy
+import           Data.Array.ST
+import           Data.List
+import           Data.Maybe
+import           Debug.Trace
+import           System.Console.ANSI
+import           System.IO
+import           Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState s = ProgState
-  { ip :: Integer,
-    base :: Integer,
-    outputs :: [Integer],
-    key :: MVar Char,
-    inputF :: InputF s,
-    ballx :: Integer,
-    paddlex :: Integer
-  }
+data ProgState s =
+  ProgState
+    { ip      :: Integer
+    , base    :: Integer
+    , outputs :: [Integer]
+    , key     :: MVar Char
+    , inputF  :: InputF s
+    , ballx   :: Integer
+    , paddlex :: Integer
+    }
 
 type IntProg s = STArray s Integer Integer
 
@@ -54,7 +55,13 @@ playGame prog key manual = do
   if manual
     then setupKeypress >> forkIO getKeypress
     else myThreadId
-  runSTT $ runProgram prog key (if manual then getKey else getAi)
+  runSTT $
+    runProgram
+      prog
+      key
+      (if manual
+         then getKey
+         else getAi)
   setCursorPosition 40 0
   putStrLn "Game Over"
   where
@@ -65,17 +72,18 @@ displayBoard = gets outputs >>= displayBoard'
 
 displayBoard' :: [Integer] -> GameState s
 displayBoard' [] = return ()
-displayBoard' (s : 0 : (-1) : xs) = do
+displayBoard' (s:0:(-1):xs) = do
   liftIO $ setCursorPosition 1 17
   liftIO $ putStr (show s)
   displayBoard' xs
-displayBoard' (t : y : x : xs) = do
-  tile <- case t of
-    0 -> return ' '
-    1 -> return '▓'
-    2 -> return '■'
-    3 -> putPaddleX x >> return '='
-    4 -> putBallX x >> return 'o'
+displayBoard' (t:y:x:xs) = do
+  tile <-
+    case t of
+      0 -> return ' '
+      1 -> return '▓'
+      2 -> return '■'
+      3 -> putPaddleX x >> return '='
+      4 -> putBallX x >> return 'o'
   liftIO $ setCursorPosition (fromIntegral y + 2) (fromIntegral x)
   liftIO $ putChar tile
   displayBoard' xs
@@ -99,15 +107,15 @@ runProgram' prog = do
   i <- gets ip
   instr <- lift $ readArray prog i
   case instr `rem` 100 of
-    1 -> plusMult prog (+)
-    2 -> plusMult prog (*)
-    3 -> input prog
-    4 -> output prog
-    5 -> jump prog (/=)
-    6 -> jump prog (==)
-    7 -> cond prog (<)
-    8 -> cond prog (==)
-    9 -> adjBase prog
+    1  -> plusMult prog (+)
+    2  -> plusMult prog (*)
+    3  -> input prog
+    4  -> output prog
+    5  -> jump prog (/=)
+    6  -> jump prog (==)
+    7  -> cond prog (<)
+    8  -> cond prog (==)
+    9  -> adjBase prog
     99 -> return ()
 
 shift offset instr = (instr `div` place) `rem` 10
@@ -120,28 +128,34 @@ getPmode prog offset = do
   lift $ shift offset <$> readArray prog i
 
 {-# ANN readParam "Hlint: ignore Reduce duplication" #-}
+
 readParam :: IntProg s -> Integer -> StateT (ProgState s) (STT s IO) Integer
 readParam prog offset = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  lift $ case pmode of
-    0 -> readArray prog >=> readArray prog $ i + offset
-    1 -> readArray prog (i + offset)
-    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+  lift $
+    case pmode of
+      0 -> readArray prog >=> readArray prog $ i + offset
+      1 -> readArray prog (i + offset)
+      2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT (ProgState s) (STT s IO) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
 
 {-# ANN writeParam "Hlint: ignore Reduce duplication" #-}
-writeParam :: IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
+
+writeParam ::
+     IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
 writeParam prog offset val = do
   i <- gets ip
   bp <- gets base
   pmode <- getPmode prog offset
-  c <- lift $ case pmode of
-    0 -> readArray prog (i + offset)
-    2 -> (+ bp) <$> readArray prog (i + offset)
+  c <-
+    lift $
+    case pmode of
+      0 -> readArray prog (i + offset)
+      2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
 putIP i = modify (\s -> s {ip = i})
@@ -162,28 +176,32 @@ plusMult prog op = do
   runProgram' prog
 
 getKey :: InputF s
-getKey = do
+getKey
   -- get input
+ = do
   k <- wait
   (liftIO . threadDelay) 500000
-  return $ case k of
-    'a' -> -1
-    'd' -> 1
-    _ -> 0
+  return $
+    case k of
+      'a' -> -1
+      'd' -> 1
+      _   -> 0
 
 getAi :: InputF s
 getAi = do
   paddleX <- gets paddlex
   ballX <- gets ballx
   (liftIO . threadDelay) 50000
-  return $ case compare paddleX ballX of
-    LT -> 1
-    EQ -> 0
-    GT -> -1
+  return $
+    case compare paddleX ballX of
+      LT -> 1
+      EQ -> 0
+      GT -> -1
 
 input :: IntProg s -> GameState s
-input prog = do
+input prog
   -- display board
+ = do
   displayBoard >> putOutputs []
   liftIO $ hFlush stdout
   writeParam prog 1 =<< (join . gets) inputF
@@ -205,14 +223,20 @@ jump :: IntProg s -> IntCond -> GameState s
 jump prog p = do
   i <- gets ip
   (a, b) <- readParams prog
-  let i' = if p a 0 then b else i + 3
+  let i' =
+        if p a 0
+          then b
+          else i + 3
   putIP i'
   runProgram' prog
 
 cond :: IntProg s -> IntCond -> GameState s
 cond prog p = do
   (a, b) <- readParams prog
-  let val = if p a b then 1 else 0
+  let val =
+        if p a b
+          then 1
+          else 0
   writeParam prog 3 val
   gets ip >>= putIP . (+ 4)
   runProgram' prog

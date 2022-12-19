@@ -1,9 +1,9 @@
-import Data.Array
-import Data.Char
-import Data.List.Split
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Utils
+import           Data.Array
+import           Data.Char
+import           Data.List.Split
+import           Data.Map        (Map)
+import qualified Data.Map        as Map
+import           Utils
 
 type Region = Array (Int, Int) Int
 
@@ -24,4 +24,5 @@ genRegion u depth = region
     erosion (x, 0) = (x * 16807 + depth) `rem` 20183
     erosion p@(x, y)
       | p == u = depth `rem` 20183
-      | otherwise = (region ! (x - 1, y) * region ! (x, y - 1) + depth) `rem` 20183
+      | otherwise =
+        (region ! (x - 1, y) * region ! (x, y - 1) + depth) `rem` 20183
