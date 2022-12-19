@@ -1,53 +1,44 @@
 module Utils
-  ( readLines,
-    splitString,
-    slices,
-    getFile,
-    parseFile,
-    mcount,
-    count,
-    fourDirs,
-    eightDirs,
-    eightDirs3D,
-    eightDirs4D,
-    dir,
-    psum,
-    psum3,
-    psum4,
-    gridMap,
-    d2r,
-    egcd,
-    modInv,
-    modCeil,
-    crt,
-    lexeme,
-    decimal,
-    signed,
-    symbol,
-    word,
-    Parser,
-    xor,
-    bin2dec,
-    isqrt,
-  )
-where
+  ( readLines
+  , splitString
+  , slices
+  , getFile
+  , parseFile
+  , mcount
+  , count
+  , fourDirs
+  , eightDirs
+  , eightDirs3D
+  , eightDirs4D
+  , dir
+  , psum
+  , psum3
+  , psum4
+  , gridMap
+  , d2r
+  , egcd
+  , modInv
+  , modCeil
+  , crt
+  , lexeme
+  , decimal
+  , signed
+  , symbol
+  , word
+  , Parser
+  , xor
+  , bin2dec
+  , isqrt
+  ) where
 
-import Control.Monad
-import qualified Data.Map as Map
-import Data.Void
-import Text.Megaparsec
-  ( ParsecT,
-    errorBundlePretty,
-    runParserT,
-    some,
-  )
-import Text.Megaparsec.Char (char, letterChar, space)
-import qualified Text.Megaparsec.Char.Lexer as L
-  ( decimal,
-    lexeme,
-    signed,
-    symbol,
-  )
+import           Control.Monad
+import qualified Data.Map                   as Map
+import           Data.Void
+import           Text.Megaparsec            (ParsecT, errorBundlePretty,
+                                             runParserT, some)
+import           Text.Megaparsec.Char       (letterChar, space)
+import qualified Text.Megaparsec.Char.Lexer as L (decimal, lexeme, signed,
+                                                  symbol)
 
 type Parser = ParsecT Void String IO
 
@@ -73,26 +64,26 @@ eightDirs =
 
 eightDirs3D =
   [ (x, y, z)
-    | x <- [-1 .. 1],
-      y <- [-1 .. 1],
-      z <- [-1 .. 1],
-      abs x + abs y + abs z > 0
+  | x <- [-1 .. 1]
+  , y <- [-1 .. 1]
+  , z <- [-1 .. 1]
+  , abs x + abs y + abs z > 0
   ]
 
 eightDirs4D =
   [ (x, y, z, w)
-    | x <- [-1 .. 1],
-      y <- [-1 .. 1],
-      z <- [-1 .. 1],
-      w <- [-1 .. 1],
-      abs x + abs y + abs z + abs w > 0
+  | x <- [-1 .. 1]
+  , y <- [-1 .. 1]
+  , z <- [-1 .. 1]
+  , w <- [-1 .. 1]
+  , abs x + abs y + abs z + abs w > 0
   ]
 
 dir "N" = (1, 0)
 dir "E" = (0, 1)
 dir "S" = (-1, 0)
 dir "W" = (0, -1)
-dir _ = error "wrong dir"
+dir _   = error "wrong dir"
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -110,7 +101,7 @@ parseFile file parser = do
   e <- runParserT parser "" input
   return $
     case e of
-      Left x -> error $ errorBundlePretty x
+      Left x  -> error $ errorBundlePretty x
       Right x -> x
 
 splitString :: (Char -> Bool) -> String -> [String]
@@ -118,14 +109,13 @@ splitString p s =
   case dropWhile p s of
     "" -> []
     s' -> w : splitString p s''
-      where
-        (w, s'') = break p s'
+      where (w, s'') = break p s'
 
 slices :: Int -> [a] -> [[a]]
 slices size s =
   case splitAt size s of
     (x, []) -> [x]
-    (x, y) -> x : slices size y
+    (x, y)  -> x : slices size y
 
 count f = length . filter f
 
@@ -145,7 +135,7 @@ pprod (x, y) (x', y') = (x * x', y * y')
 gridMap :: [[a]] -> Map.Map (Integer, Integer) a
 gridMap input =
   Map.fromList . join $
-    zipWith (\i s -> zipWith (\j c -> ((i, j), c)) [0 ..] s) [0 ..] input
+  zipWith (\i s -> zipWith (\j c -> ((i, j), c)) [0 ..] s) [0 ..] input
 
 d2r theta = pi * theta / 180
 
@@ -162,7 +152,7 @@ modInv a b =
     (x, y)
       | a * x + b * y == 1 -> Right x
       | otherwise ->
-          Left $ "No modular inverse for " ++ show a ++ " and " ++ show b
+        Left $ "No modular inverse for " ++ show a ++ " and " ++ show b
 
 modCeil a n =
   if a `mod` n == 0
@@ -171,8 +161,8 @@ modCeil a n =
 
 crt :: [Int] -> [Int] -> Either String Int
 crt residues modulii =
-  zipWithM modInv crtModulii modulii
-    >>= Right . (`mod` modPI) . sum . zipWith (*) crtModulii . zipWith (*) residues
+  zipWithM modInv crtModulii modulii >>=
+  Right . (`mod` modPI) . sum . zipWith (*) crtModulii . zipWith (*) residues
   where
     modPI = product modulii
     crtModulii = (modPI `div`) <$> modulii
