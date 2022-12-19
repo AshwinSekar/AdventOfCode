@@ -2,31 +2,32 @@ import Control.Applicative
 import Control.Concurrent
 import Control.Monad
 import Control.Monad.ST.Trans
-import Control.Monad.Trans.State.Lazy
 import Control.Monad.Trans.Class
-
-import Data.Array.ST
+import Control.Monad.Trans.State.Lazy
 import Data.Array
+import Data.Array.ST
 import Data.Char
 import Data.List
 import Data.Maybe
-
 import Debug.Trace
-
-import System.IO
 import System.Console.ANSI
+import System.IO
 import System.Random
-
 import Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState s = ProgState { ip :: Integer,
-                               base :: Integer,
-                               inputs :: [Int]
-                             }
+data ProgState s = ProgState
+  { ip :: Integer,
+    base :: Integer,
+    inputs :: [Int]
+  }
+
 type IntProg s = STArray s Integer Integer
+
 type GameState s = StateT (ProgState s) (STT s IO) ()
+
 type IntOp = (Integer -> Integer -> Integer)
+
 type IntCond = (Integer -> Integer -> Bool)
 
 liftIO :: IO a -> StateT (ProgState s) (STT s IO) a
@@ -40,11 +41,10 @@ main = do
   runSTT $ runProgram intprog
   hFlush stdout
 
-
 runProgram :: [Integer] -> STT s IO ()
 runProgram intprog = do
   prog <- newArray (0, 8192) 0
-  zipWithM_ (writeArray prog) [0..] intprog
+  zipWithM_ (writeArray prog) [0 ..] intprog
   let initState = ProgState 0 0 []
   -- evaluate the program
   evalStateT (runProgram' prog) initState
@@ -66,7 +66,8 @@ runProgram' prog = do
     99 -> return ()
 
 shift offset instr = (instr `div` place) `rem` 10
-  where place = 10 ^ (offset + 1)
+  where
+    place = 10 ^ (offset + 1)
 
 getPmode prog offset = do
   i <- gets ip
@@ -80,9 +81,9 @@ readParam prog offset = do
   bp <- gets base
   pmode <- getPmode prog offset
   lift $ case pmode of
-          0 -> readArray prog >=> readArray prog $ i + offset
-          1 -> readArray prog (i + offset)
-          2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+    0 -> readArray prog >=> readArray prog $ i + offset
+    1 -> readArray prog (i + offset)
+    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT (ProgState s) (STT s IO) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
@@ -94,25 +95,25 @@ writeParam prog offset val = do
   bp <- gets base
   pmode <- getPmode prog offset
   c <- lift $ case pmode of
-        0 -> readArray prog (i + offset)
-        2 -> (+ bp) <$> readArray prog (i + offset)
+    0 -> readArray prog (i + offset)
+    2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
-
 putIP i = modify (\s -> s {ip = i})
+
 putBase b = modify (\s -> s {base = b})
+
 putInputs i = modify (\s -> s {inputs = i})
 
 plusMult :: IntProg s -> IntOp -> GameState s
 plusMult prog op = do
   (a, b) <- readParams prog
   writeParam prog 3 $ a `op` b
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
-
 getInput :: [Int] -> StateT (ProgState s) (STT s IO) [Int]
-getInput (x:xs) = return $ x:xs
+getInput (x : xs) = return $ x : xs
 getInput [] = do
   inputs <- liftIO $ (++ "\n") <$> getLine
   let ascii = map ord inputs
@@ -121,17 +122,17 @@ getInput [] = do
 
 input :: IntProg s -> GameState s
 input prog = do
-  m:ins <- getInput =<< gets inputs
+  m : ins <- getInput =<< gets inputs
   writeParam prog 1 (fromIntegral m)
   putInputs ins
-  gets ip >>= putIP . (+2)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog
 
 output :: IntProg s -> GameState s
 output prog = do
   c <- fromIntegral <$> readParam prog 1
   liftIO $ putChar (chr c)
-  gets ip >>= putIP . (+2)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog
 
 jump :: IntProg s -> IntCond -> GameState s
@@ -147,12 +148,12 @@ cond prog p = do
   (a, b) <- readParams prog
   let val = if p a b then 1 else 0
   writeParam prog 3 val
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
 adjBase :: IntProg s -> GameState s
 adjBase prog = do
   a <- readParam prog 1
-  gets base >>= putBase . (+a)
-  gets ip >>= putIP . (+2)
+  gets base >>= putBase . (+ a)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog

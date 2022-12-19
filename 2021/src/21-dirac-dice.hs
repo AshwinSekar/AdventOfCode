@@ -1,4 +1,4 @@
-import           Utils
+import Utils
 
 main :: IO ()
 main = do
@@ -10,6 +10,7 @@ main = do
           p1' = modCeil (p1 + 3 * i + 3) 10
       (w, l, d) = go 0 (2, 1) (0, 0)
   putStrLn $ "Part 1: " ++ show (l * d)
-  -- putStrLn $ "Part 2: " ++ show p2
+
+-- putStrLn $ "Part 2: " ++ show p2
 
 dirac = [2, 3, 3, 4, 4, 4, 5, 5, 6]

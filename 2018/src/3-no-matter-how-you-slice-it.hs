@@ -1,25 +1,21 @@
 {-# LANGUAGE NamedFieldPuns #-}
-import Utils
 
 import Control.Applicative
 import Control.Monad
 import Control.Monad.ST
-
 import Data.Array.IArray
 import Data.Array.ST
-import Data.Ix
 import Data.Function
 import Data.Functor
+import Data.Ix
 import Data.List
 import Data.Void
-
-import System.IO
-
-import Text.Megaparsec
-import Text.Megaparsec.Char (space, newline, string)
-import Text.Megaparsec.Char.Lexer (decimal)
-
 import Debug.Trace
+import System.IO
+import Text.Megaparsec
+import Text.Megaparsec.Char (newline, space, string)
+import Text.Megaparsec.Char.Lexer (decimal)
+import Utils
 
 type Parser = ParsecT Void String IO
 
@@ -33,15 +29,17 @@ claimParser = do
 parser :: (Num a) => Parser [Claim a]
 parser = claimParser `sepEndBy1` space
 
-data Claim a = Claim { iD :: a
-                     , minX :: a
-                     , minY :: a
-                     , maxX :: a
-                     , maxY :: a
-                     } deriving (Show, Eq)
+data Claim a = Claim
+  { iD :: a,
+    minX :: a,
+    minY :: a,
+    maxX :: a,
+    maxY :: a
+  }
+  deriving (Show, Eq)
 
 squares :: (Ix a) => Claim a -> [(a, a)]
-squares Claim{minX,minY,maxX,maxY} = range ((minX, minY), (maxX, maxY))
+squares Claim {minX, minY, maxX, maxY} = range ((minX, minY), (maxX, maxY))
 
 main :: IO ()
 main = do
@@ -57,10 +55,12 @@ main = do
 getCounts :: (Ix a) => [Claim a] -> ((a, a), (a, a)) -> ST s (STUArray s (a, a) Int)
 getCounts claims bnds = do
   counts <- newArray bnds 0
-  forM_ claims (\ c -> forM_ (squares c) $ inc counts)
+  forM_ claims (\c -> forM_ (squares c) $ inc counts)
   return counts
-  where inc c i = writeArray c i . succ =<< readArray c i
+  where
+    inc c i = writeArray c i . succ =<< readArray c i
 
 findUnique :: (Ix a, Integral e, IArray i e) => i (a, a) e -> [Claim a] -> Maybe a
 findUnique counts claims = iD <$> find unique claims
-  where unique c = all ((== 1) . (counts !)) $ squares c
+  where
+    unique c = all ((== 1) . (counts !)) $ squares c

@@ -2,33 +2,35 @@ import Control.Applicative
 import Control.Concurrent
 import Control.Monad
 import Control.Monad.ST.Trans
-import Control.Monad.Trans.State.Lazy
 import Control.Monad.Trans.Class
-
-import Data.Array.ST
+import Control.Monad.Trans.State.Lazy
 import Data.Array
+import Data.Array.ST
 import Data.Char
 import Data.List
-import Data.Maybe
 import qualified Data.Map as Map
-
+import Data.Maybe
 import Debug.Trace
-
-import System.IO
 import System.Console.ANSI
+import System.IO
 import System.Random
-
 import Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState s = ProgState { ip :: Integer,
-                               base :: Integer,
-                               inputs :: [Int]
-                             }
+data ProgState s = ProgState
+  { ip :: Integer,
+    base :: Integer,
+    inputs :: [Int]
+  }
+
 type IntProg s = STArray s Integer Integer
+
 type GameState s = StateT (ProgState s) (STT s IO) Int
+
 type IntOp = (Integer -> Integer -> Integer)
+
 type IntCond = (Integer -> Integer -> Bool)
+
 type RowData = Map.Map Int (Int, Int)
 
 liftIO :: IO a -> StateT (ProgState s) (STT s IO) a
@@ -51,21 +53,22 @@ countTractor prog b = do
 
 findGrid :: [Integer] -> Int -> STT s IO [Int]
 findGrid prog b =
-  let pos = liftM2 lister [0..b] [0..b]
-  in mapM (runProgram prog) pos
-  where lister a b = [a, b]
+  let pos = liftM2 lister [0 .. b] [0 .. b]
+   in mapM (runProgram prog) pos
+  where
+    lister a b = [a, b]
 
 getSquare :: [Integer] -> Int -> IO (Int, Int)
 getSquare prog b = do
   let init = Map.singleton 5 (3, 1) -- y pos, x position, length
-  rows <- foldM (computeRow prog) init [6..2000]
-  let Just y = find (fits b rows) [6..2000]
-  return (fst $ rows Map.! (y + b -1 ), y)
+  rows <- foldM (computeRow prog) init [6 .. 2000]
+  let Just y = find (fits b rows) [6 .. 2000]
+  return (fst $ rows Map.! (y + b - 1), y)
 
 fits b rows y =
   let (s, l) = rows Map.! y
       (s', l') = rows Map.! (y + b - 1)
-  in l - (s' - s) >= b
+   in l - (s' - s) >= b
 
 computeRow :: [Integer] -> RowData -> Int -> IO RowData
 computeRow prog rd y' = do
@@ -91,7 +94,7 @@ findL prog y start l = do
 runProgram :: [Integer] -> [Int] -> STT s IO Int
 runProgram intprog ins = do
   prog <- newArray (0, 4096) 0
-  zipWithM_ (writeArray prog) [0..] intprog
+  zipWithM_ (writeArray prog) [0 ..] intprog
   let initState = ProgState 0 0 ins
   -- evaluate the program
   evalStateT (runProgram' prog) initState
@@ -113,7 +116,8 @@ runProgram' prog = do
     99 -> return $ -1
 
 shift offset instr = (instr `div` place) `rem` 10
-  where place = 10 ^ (offset + 1)
+  where
+    place = 10 ^ (offset + 1)
 
 getPmode prog offset = do
   i <- gets ip
@@ -127,9 +131,9 @@ readParam prog offset = do
   bp <- gets base
   pmode <- getPmode prog offset
   lift $ case pmode of
-          0 -> readArray prog >=> readArray prog $ i + offset
-          1 -> readArray prog (i + offset)
-          2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+    0 -> readArray prog >=> readArray prog $ i + offset
+    1 -> readArray prog (i + offset)
+    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT (ProgState s) (STT s IO) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
@@ -141,34 +145,35 @@ writeParam prog offset val = do
   bp <- gets base
   pmode <- getPmode prog offset
   c <- lift $ case pmode of
-        0 -> readArray prog (i + offset)
-        2 -> (+ bp) <$> readArray prog (i + offset)
+    0 -> readArray prog (i + offset)
+    2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
-
 putIP i = modify (\s -> s {ip = i})
+
 putBase b = modify (\s -> s {base = b})
+
 putInputs i = modify (\s -> s {inputs = i})
 
 plusMult :: IntProg s -> IntOp -> GameState s
 plusMult prog op = do
   (a, b) <- readParams prog
   writeParam prog 3 $ a `op` b
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
 input :: IntProg s -> GameState s
 input prog = do
-  m:ins <- gets inputs
+  m : ins <- gets inputs
   writeParam prog 1 (fromIntegral m)
   putInputs ins
-  gets ip >>= putIP . (+2)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog
 
 output :: IntProg s -> GameState s
 output prog = do
   c <- fromIntegral <$> readParam prog 1
-  gets ip >>= putIP . (+2)
+  gets ip >>= putIP . (+ 2)
   return c
 
 jump :: IntProg s -> IntCond -> GameState s
@@ -184,12 +189,12 @@ cond prog p = do
   (a, b) <- readParams prog
   let val = if p a b then 1 else 0
   writeParam prog 3 val
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
 adjBase :: IntProg s -> GameState s
 adjBase prog = do
   a <- readParam prog 1
-  gets base >>= putBase . (+a)
-  gets ip >>= putIP . (+2)
+  gets base >>= putBase . (+ a)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog

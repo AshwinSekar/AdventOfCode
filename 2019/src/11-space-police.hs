@@ -1,34 +1,39 @@
 import Control.Applicative
 import Control.Monad
 import Control.Monad.ST
-import Control.Monad.Trans.State.Lazy
 import Control.Monad.Trans.Class
-
+import Control.Monad.Trans.State.Lazy
 import Data.Array.ST
 import Data.Bool
 import Data.List
 import qualified Data.Set as Set
 import Debug.Trace
-
 import Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState = ProgState { ip :: Integer,
-                             base :: Integer,
-                             pos :: (Integer, Integer),
-                             dir :: (Integer, Integer),
-                             toPaint :: Bool,
-                             white :: Set.Set (Integer, Integer),
-                             cnt :: Set.Set (Integer, Integer)
-                           } deriving (Show)
+data ProgState = ProgState
+  { ip :: Integer,
+    base :: Integer,
+    pos :: (Integer, Integer),
+    dir :: (Integer, Integer),
+    toPaint :: Bool,
+    white :: Set.Set (Integer, Integer),
+    cnt :: Set.Set (Integer, Integer)
+  }
+  deriving (Show)
+
 type IntProg s = STArray s Integer Integer
+
 type StateWithOutputs s = StateT ProgState (ST s) [Integer]
+
 type IntOp = (Integer -> Integer -> Integer)
+
 type IntCond = (Integer -> Integer -> Bool)
 
 -- Brain state
 shift offset instr = (instr `div` place) `rem` 10
-  where place = 10 ^ (offset + 1)
+  where
+    place = 10 ^ (offset + 1)
 
 getPmode prog offset = do
   i <- gets ip
@@ -42,9 +47,9 @@ readParam prog offset = do
   bp <- gets base
   pmode <- getPmode prog offset
   lift $ case pmode of
-          0 -> readArray prog >=> readArray prog $ i + offset
-          1 -> readArray prog (i + offset)
-          2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+    0 -> readArray prog >=> readArray prog $ i + offset
+    1 -> readArray prog (i + offset)
+    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT ProgState (ST s) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
@@ -56,12 +61,12 @@ writeParam prog offset val = do
   bp <- gets base
   pmode <- getPmode prog offset
   c <- lift $ case pmode of
-        0 -> readArray prog (i + offset)
-        2 -> (+ bp) <$> readArray prog (i + offset)
+    0 -> readArray prog (i + offset)
+    2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
-
 putIP i = modify (\s -> s {ip = i})
+
 putBase b = modify (\s -> s {base = b})
 
 -- Robot state
@@ -78,21 +83,24 @@ paint 0 = liftM2 Set.delete (gets pos) (gets white) >>= putWhite
 updateCnt :: StateT ProgState (ST s) ()
 updateCnt = liftM2 Set.insert (gets pos) (gets cnt) >>= putCnt
 
-turnDir 0 (0, 1)  = (-1, 0)
+turnDir 0 (0, 1) = (-1, 0)
 turnDir 0 (-1, 0) = (0, -1)
 turnDir 0 (0, -1) = (1, 0)
-turnDir 0 (1, 0)  = (0, 1)
+turnDir 0 (1, 0) = (0, 1)
 turnDir 1 (-1, 0) = (0, 1)
 turnDir 1 (0, -1) = (-1, 0)
-turnDir 1 (1, 0)  = (0, -1)
-turnDir 1 (0, 1)  = (1, 0)
+turnDir 1 (1, 0) = (0, -1)
+turnDir 1 (0, 1) = (1, 0)
 
 putWhite p = modify (\s -> s {white = p})
-putCnt p = modify (\s -> s {cnt = p})
-putToPaint p = modify (\s -> s {toPaint = p})
-putPos p = modify (\s -> s {pos = p})
-putDir p = modify (\s -> s {dir = p})
 
+putCnt p = modify (\s -> s {cnt = p})
+
+putToPaint p = modify (\s -> s {toPaint = p})
+
+putPos p = modify (\s -> s {pos = p})
+
+putDir p = modify (\s -> s {dir = p})
 
 main :: IO ()
 main = do
@@ -110,17 +118,17 @@ main = do
 ascii whites =
   let (xs, xb) = (Set.findMin $ Set.map fst whites, Set.findMax $ Set.map fst whites)
       (ys, yb) = (Set.findMin $ Set.map snd whites, Set.findMax $ Set.map snd whites)
-  in  map (\y -> map (asciiChar y) [xs..xb]) $ reverse [ys..yb]
-  where asciiChar y x = if Set.member (x, y) whites then '#' else ' '
+   in map (\y -> map (asciiChar y) [xs .. xb]) $ reverse [ys .. yb]
+  where
+    asciiChar y x = if Set.member (x, y) whites then '#' else ' '
 
 driveRobot :: [Integer] -> ProgState -> ST s ProgState
 driveRobot brain initState = do
   prog <- newArray (0, 4096) 0
-  zipWithM_ (writeArray prog) [0..] brain
-  let
-  -- evaluate the program
-  execStateT (runProgram' prog) initState
+  zipWithM_ (writeArray prog) [0 ..] brain
+  let -- evaluate the program
 
+  execStateT (runProgram' prog) initState
 
 runProgram' :: IntProg s -> StateWithOutputs s
 runProgram' prog = do
@@ -138,20 +146,18 @@ runProgram' prog = do
     9 -> adjBase prog
     99 -> lift $ return []
 
-
-
 plusMult :: IntProg s -> IntOp -> StateWithOutputs s
 plusMult prog op = do
   (a, b) <- readParams prog
   writeParam prog 3 $ a `op` b
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
 input :: IntProg s -> StateWithOutputs s
 input prog = do
   c <- bool 0 1 <$> liftM2 Set.member (gets pos) (gets white)
   writeParam prog 1 c
-  gets ip >>= putIP . (+2)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog
 
 output :: IntProg s -> StateWithOutputs s
@@ -160,8 +166,8 @@ output prog = do
   toPaint <- gets toPaint
   if toPaint then paint a >> updateCnt else turn a >> move
   putToPaint $ not toPaint
-  gets ip >>= putIP . (+2)
-  (a:) <$> runProgram' prog
+  gets ip >>= putIP . (+ 2)
+  (a :) <$> runProgram' prog
 
 jump :: IntProg s -> IntCond -> StateWithOutputs s
 jump prog p = do
@@ -176,12 +182,12 @@ cond prog p = do
   (a, b) <- readParams prog
   let val = if p a b then 1 else 0
   writeParam prog 3 val
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
 adjBase :: IntProg s -> StateWithOutputs s
 adjBase prog = do
   a <- readParam prog 1
-  gets base >>= putBase . (+a)
-  gets ip >>= putIP . (+2)
+  gets base >>= putBase . (+ a)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog

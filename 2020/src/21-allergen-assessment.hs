@@ -1,24 +1,26 @@
-import Utils
-
 import Control.Applicative (liftA2)
 import Data.List
 import qualified Data.Map as Map
 import qualified Data.Set as Set
-import Text.Megaparsec (someTill, some, sepBy)
+import Text.Megaparsec (sepBy, some, someTill)
 import Text.Megaparsec.Char (letterChar)
+import Utils
 
 parser :: Parser ([String], [String])
-parser = liftA2 (,)
-          (someTill (lexeme $ some letterChar) $ symbol "(contains")
-          (some letterChar `sepBy` symbol "," <* symbol ")")
+parser =
+  liftA2
+    (,)
+    (someTill (lexeme $ some letterChar) $ symbol "(contains")
+    (some letterChar `sepBy` symbol "," <* symbol ")")
 
 solve :: Map.Map String (Set.Set String) -> Map.Map String String -> Map.Map String String
 solve poss mapping
   | all Set.null poss = mapping
-  | otherwise         = solve poss' mapping'
-  where solved   = Map.filter ((==1) . Set.size) poss
-        mapping' = Map.foldlWithKey (\m a (Set.toList -> [i]) -> Map.insert a i m) mapping solved
-        poss'    = Map.map (\s -> s Set.\\ Set.unions solved) poss
+  | otherwise = solve poss' mapping'
+  where
+    solved = Map.filter ((== 1) . Set.size) poss
+    mapping' = Map.foldlWithKey (\m a (Set.toList -> [i]) -> Map.insert a i m) mapping solved
+    poss' = Map.map (\s -> s Set.\\ Set.unions solved) poss
 
 main :: IO ()
 main = do

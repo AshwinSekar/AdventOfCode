@@ -1,17 +1,16 @@
 import Control.Applicative
 import Control.Monad
 import Control.Monad.ST
-import Data.Maybe
-
 import Data.Array.ST
 import Data.List
+import Data.Maybe
 import Debug.Trace
-
 import Utils
 
-data WireSegment = Horizontal { y :: Integer, x1 :: Integer, x2 :: Integer, s :: Integer}
-                 | Vertical { x :: Integer, y1 :: Integer, y2 :: Integer, s :: Integer}
-                 deriving (Show, Ord, Eq)
+data WireSegment
+  = Horizontal {y :: Integer, x1 :: Integer, x2 :: Integer, s :: Integer}
+  | Vertical {x :: Integer, y1 :: Integer, y2 :: Integer, s :: Integer}
+  deriving (Show, Ord, Eq)
 
 main :: IO ()
 main = do
@@ -28,7 +27,8 @@ main = do
 
 segment :: [String] -> [WireSegment]
 segment wire = scanl1 segment' $ map (toSegment . parse) wire
-  where parse s = (head s, read $ drop 1 s)
+  where
+    parse s = (head s, read $ drop 1 s)
 
 toSegment :: (Char, Integer) -> WireSegment
 toSegment ('R', d) = Horizontal 0 0 d d
@@ -56,9 +56,11 @@ between x y z
   | x >= y = y >= z
 
 manhattanMin :: [(Integer, Integer, Integer, Integer)] -> Integer
-manhattanMin ints = minimum $ filter (>0) (map manhattan ints)
-  where manhattan (x, y, _, _) = abs x + abs y
+manhattanMin ints = minimum $ filter (> 0) (map manhattan ints)
+  where
+    manhattan (x, y, _, _) = abs x + abs y
 
 stepMin :: [(Integer, Integer, Integer, Integer)] -> Integer
-stepMin ints = minimum $ filter (>0) (map step ints)
-  where step (_, _, s1, s2) = s1 + s2
+stepMin ints = minimum $ filter (> 0) (map step ints)
+  where
+    step (_, _, s1, s2) = s1 + s2

@@ -2,43 +2,49 @@ import Control.Applicative
 import Control.Concurrent
 import Control.Monad
 import Control.Monad.ST.Trans
-import Control.Monad.Trans.State.Lazy
 import Control.Monad.Trans.Class
-
+import Control.Monad.Trans.State.Lazy
 import Data.Array.ST
 import qualified Data.Heap as PQ
-import qualified Data.Map.Lazy as Map
 import Data.List
+import qualified Data.Map.Lazy as Map
 import Data.Maybe
-
 import Debug.Trace
-
-import System.IO
 import System.Console.ANSI
+import System.IO
 import System.Random
-
 import Utils
 
 -- prog, instruction pointer, relative base, inputs
-data ProgState s = ProgState { ip :: Integer,
-                               base :: Integer,
-                               mov :: Integer,
-                               dir :: Integer,
-                               pos :: (Int, Int),
-                               grid :: STArray s (Int, Int) (Maybe Integer),
-                               inputF :: InputF s,
-                               oxy :: Maybe (Int, Int)
-                             }
-data BFSState s = BFSState { maze :: STArray s (Int, Int) (Maybe Integer),
-                             pq :: PriorityQueue,
-                             visited :: Map.Map (Int, Int) Int
-                           }
+data ProgState s = ProgState
+  { ip :: Integer,
+    base :: Integer,
+    mov :: Integer,
+    dir :: Integer,
+    pos :: (Int, Int),
+    grid :: STArray s (Int, Int) (Maybe Integer),
+    inputF :: InputF s,
+    oxy :: Maybe (Int, Int)
+  }
+
+data BFSState s = BFSState
+  { maze :: STArray s (Int, Int) (Maybe Integer),
+    pq :: PriorityQueue,
+    visited :: Map.Map (Int, Int) Int
+  }
+
 type IntProg s = STArray s Integer Integer
+
 type MazeState s = StateT (ProgState s) (STT s IO) ()
+
 type FloodState s = StateT (BFSState s) (STT s IO) ()
+
 type PriorityQueue = PQ.MinPrioHeap Int (Int, Int)
+
 type IntOp = (Integer -> Integer -> Integer)
+
 type IntCond = (Integer -> Integer -> Bool)
+
 type InputF s = StateT (ProgState s) (STT s IO) Integer
 
 liftIO :: IO a -> StateT (ProgState s) (STT s IO) a
@@ -50,7 +56,6 @@ main = do
   let inputs = splitString (== ',') input
       intprog = map read inputs :: [Integer]
   runDroid intprog
-
 
 bfs :: ProgState s -> STT s IO ()
 bfs state = do
@@ -92,12 +97,14 @@ addDirs pos p = do
   let pos' = map (applyDir pos) ds
       pq' = foldl (ins p) pq pos'
   putPQ pq'
-  where ds = [1, 2, 3, 4]
+  where
+    ds = [1, 2, 3, 4]
 
 ins :: Int -> PriorityQueue -> (Int, Int) -> PriorityQueue
 ins p pq' pos = PQ.insert (p + 1, pos) pq'
 
 putV v = modify (\s -> s {visited = v})
+
 putPQ q = modify (\s -> s {pq = q})
 
 runDroid :: [Integer] -> IO ()
@@ -123,11 +130,10 @@ turnL 2 = 4
 turnL 3 = 2
 turnL 4 = 1
 
-
 displayDroid (posx', posy') status = do
   (posx, posy) <- gets pos
   g <- gets grid
-  s'<- lift $ readArray g (posx, posy)
+  s' <- lift $ readArray g (posx, posy)
   liftIO $ setCursorPosition posy posx
   case s' of
     Just 1 -> liftIO $ putChar '·'
@@ -152,17 +158,15 @@ updateAndDisplay status = do
     1 -> putPos p'
     2 -> putOxy (Just p') >> putPos p'
 
-
 runProgram :: [Integer] -> InputF s -> STT s IO (ProgState s)
 runProgram intprog input = do
   prog <- newArray (0, 4096) 0
-  zipWithM_ (writeArray prog) [0..] intprog
+  zipWithM_ (writeArray prog) [0 ..] intprog
   grid <- newArray ((-1024, -1024), (1024, 1024)) Nothing
   writeArray grid (60, 30) $ Just 3 -- Mark the initial spot
   let initState = ProgState 0 0 1 1 (60, 30) grid input Nothing
   -- evaluate the program
   execStateT (runProgram' prog) initState
-
 
 runProgram' :: IntProg s -> MazeState s
 runProgram' prog = do
@@ -181,7 +185,8 @@ runProgram' prog = do
     99 -> return ()
 
 shift offset instr = (instr `div` place) `rem` 10
-  where place = 10 ^ (offset + 1)
+  where
+    place = 10 ^ (offset + 1)
 
 getPmode prog offset = do
   i <- gets ip
@@ -195,9 +200,9 @@ readParam prog offset = do
   bp <- gets base
   pmode <- getPmode prog offset
   lift $ case pmode of
-          0 -> readArray prog >=> readArray prog $ i + offset
-          1 -> readArray prog (i + offset)
-          2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+    0 -> readArray prog >=> readArray prog $ i + offset
+    1 -> readArray prog (i + offset)
+    2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
 
 readParams :: IntProg s -> StateT (ProgState s) (STT s IO) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
@@ -209,23 +214,27 @@ writeParam prog offset val = do
   bp <- gets base
   pmode <- getPmode prog offset
   c <- lift $ case pmode of
-        0 -> readArray prog (i + offset)
-        2 -> (+ bp) <$> readArray prog (i + offset)
+    0 -> readArray prog (i + offset)
+    2 -> (+ bp) <$> readArray prog (i + offset)
   void $ lift (writeArray prog c val)
 
-
 putIP i = modify (\s -> s {ip = i})
+
 putBase b = modify (\s -> s {base = b})
+
 putPos p = modify (\s -> s {pos = p})
+
 putMov m = modify (\s -> s {mov = m})
+
 putDir m = modify (\s -> s {dir = m})
+
 putOxy o = modify (\s -> s {oxy = o})
 
 plusMult :: IntProg s -> IntOp -> MazeState s
 plusMult prog op = do
   (a, b) <- readParams prog
   writeParam prog 3 $ a `op` b
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
 getAi :: InputF s
@@ -249,13 +258,12 @@ newDir d = do
     then newDir (turnL d)
     else return d
 
-
 input :: IntProg s -> MazeState s
 input prog = do
   mov <- (join . gets) inputF
   writeParam prog 1 mov
   putMov mov
-  gets ip >>= putIP . (+2)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog
 
 done :: StateT (ProgState s) (STT s IO) Bool
@@ -270,7 +278,7 @@ done = do
 output :: IntProg s -> MazeState s
 output prog = do
   status <- readParam prog 1
-  gets ip >>= putIP . (+2)
+  gets ip >>= putIP . (+ 2)
   end <- done
   updateAndDisplay status
   unless end $ runProgram' prog
@@ -288,12 +296,12 @@ cond prog p = do
   (a, b) <- readParams prog
   let val = if p a b then 1 else 0
   writeParam prog 3 val
-  gets ip >>= putIP . (+4)
+  gets ip >>= putIP . (+ 4)
   runProgram' prog
 
 adjBase :: IntProg s -> MazeState s
 adjBase prog = do
   a <- readParam prog 1
-  gets base >>= putBase . (+a)
-  gets ip >>= putIP . (+2)
+  gets base >>= putBase . (+ a)
+  gets ip >>= putIP . (+ 2)
   runProgram' prog

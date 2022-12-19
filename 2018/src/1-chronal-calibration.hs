@@ -1,16 +1,16 @@
+import qualified Data.Set as Set
 import Utils
 
-import qualified Data.Set as Set
-
 parseStr :: String -> Integer
-parseStr (y:ys)
-  | y == '+'  = read ys
-  | otherwise = read (y:ys)
+parseStr (y : ys)
+  | y == '+' = read ys
+  | otherwise = read (y : ys)
 
 findDup :: [Integer] -> Set.Set Integer -> Integer
-findDup (x:xs) s = if Set.member x s
-                      then x
-                      else findDup xs (Set.insert x s)
+findDup (x : xs) s =
+  if Set.member x s
+    then x
+    else findDup xs (Set.insert x s)
 
 main :: IO ()
 main = do
@@ -28,4 +28,4 @@ part2 :: [String] -> Integer
 part2 input =
   let infInput = cycle $ map parseStr input
       prefSum = scanl (+) 0 infInput
-  in  findDup prefSum Set.empty
+   in findDup prefSum Set.empty

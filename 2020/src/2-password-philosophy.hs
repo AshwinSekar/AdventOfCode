@@ -1,16 +1,13 @@
-import Utils
-
 import Control.Monad
 import Control.Monad.ST
-
 import Data.Function ((&))
-import qualified Data.Set as Set
 import Data.Map ((!))
 import qualified Data.Map as Map
-
+import qualified Data.Set as Set
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char (letterChar, space)
+import Utils
 
 type Policy a = (a, a, Char)
 
@@ -28,7 +25,8 @@ parser = pswdParser `sepEndBy1` space
 valid :: (Policy Int, String) -> Bool
 valid ((lo, hi, char), pswd) =
   lo <= occ && occ <= hi
-  where occ = length $ filter (==char) pswd
+  where
+    occ = length $ filter (== char) pswd
 
 valid2 :: (Policy Int, String) -> Bool
 valid2 ((i, j, char), pswd) =

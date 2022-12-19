@@ -1,11 +1,9 @@
-import           Utils
-
-import           Control.Applicative (liftA2)
-
-import           Data.Function       ((&))
-import           Data.Map            ((!))
-import qualified Data.Map            as Map
-import qualified Data.Set            as Set
+import Control.Applicative (liftA2)
+import Data.Function ((&))
+import Data.Map ((!))
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import Utils
 
 main :: IO ()
 main = do
@@ -14,11 +12,13 @@ main = do
       n = length depths
       f =
         foldl
-          (\(prev, s) n ->
-             ( n
-             , if n > prev
-                 then s + 1
-                 else s))
+          ( \(prev, s) n ->
+              ( n,
+                if n > prev
+                  then s + 1
+                  else s
+              )
+          )
           (maxBound :: Int, 0)
       (_, p1) = f depths
       windows =

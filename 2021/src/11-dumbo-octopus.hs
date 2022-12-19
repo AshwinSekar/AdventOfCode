@@ -1,13 +1,11 @@
-import           Utils
-
-import           Control.Applicative (empty, liftA2, (<|>))
-
-import           Data.Char           (digitToInt)
-import           Data.Function       ((&))
-import           Data.Map            ((!))
-import qualified Data.Map            as Map
-import           Data.Maybe          (isJust)
-import qualified Data.Set            as Set
+import Control.Applicative (empty, liftA2, (<|>))
+import Data.Char (digitToInt)
+import Data.Function ((&))
+import Data.Map ((!))
+import qualified Data.Map as Map
+import Data.Maybe (isJust)
+import qualified Data.Set as Set
+import Utils
 
 type OctoMap = Map.Map (Integer, Integer) Int
 

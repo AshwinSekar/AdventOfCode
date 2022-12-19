@@ -1,14 +1,12 @@
-import           Utils
-
-import           Control.Applicative (liftA2, (<|>))
-
-import           Data.Bool           (bool)
-import           Data.Char           (digitToInt)
-import           Data.Function       ((&))
-import           Data.List           (transpose)
-import           Data.Map            ((!))
-import qualified Data.Map            as Map
-import qualified Data.Set            as Set
+import Control.Applicative (liftA2, (<|>))
+import Data.Bool (bool)
+import Data.Char (digitToInt)
+import Data.Function ((&))
+import Data.List (transpose)
+import Data.Map ((!))
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import Utils
 
 main :: IO ()
 main = do
