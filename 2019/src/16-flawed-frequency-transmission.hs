@@ -23,7 +23,7 @@ fft signal =
    in take (length signal) $ map abs digits
 
 withPattern :: Int -> Int -> Int -> Int
-withPattern i s j = s * ([0, 1, 0, -1] !! ((j `div` i) `rem` 4))
+withPattern i s j = s * [0, 1, 0, -1] !! (j `div` i `rem` 4)
 
 compute :: [Int] -> Int -> Int
 compute signal i = sum $ zipWith (withPattern i) signal [1 ..]

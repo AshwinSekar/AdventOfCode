@@ -76,7 +76,7 @@ scanWater (xClay, yClay) maxY = do
   grid <- newSTArray ((0, 0), (3000, maxY + 1)) Sand
   let start = (500, 0)
       write x pos = writeSTArray grid pos x
-      read pos = readSTArray grid pos
+      read = readSTArray grid
       go pos@(x, y)
         | y > maxY = return ()
         | otherwise = do

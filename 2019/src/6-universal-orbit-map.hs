@@ -49,7 +49,7 @@ totalTransfers adjList =
       uncommons = zipWith meq aYou aSan
       (uYou, uSan) = head $ catMaybes uncommons
       (you, san) = (dropWhile (/= uYou) aYou, dropWhile (/= uSan) aSan)
-   in (length you + length san) - 2
+   in length you + length san - 2
   where
     meq a b =
       if a == b

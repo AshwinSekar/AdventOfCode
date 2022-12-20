@@ -21,7 +21,7 @@ main = do
 part1 :: Int -> String -> Int
 part1 dim input =
   let layers = slices dim input
-   in snd $ minimum $ map (\l -> (zeros l, oneTwo l)) layers
+   in snd $ minimum $ map (zeros Control.Arrow.&&& oneTwo) layers
   where
     zeros l = length $ filter (== '0') l
     oneTwo l = length (filter (== '1') l) * length (filter (== '2') l)

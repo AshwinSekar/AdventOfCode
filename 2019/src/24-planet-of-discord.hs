@@ -37,7 +37,7 @@ step :: Bugs -> Bugs
 step bugs = Map.mapWithKey (transform' bugs) bugs
 
 transform' bugs (i, z) 0
-  | (adjs bugs (i, z) == 1) || (adjs bugs (i, z) == 2) = 1
+  | adjs bugs (i, z) == 1 || adjs bugs (i, z) == 2 = 1
   | otherwise = 0
 transform' bugs (i, z) 1
   | adjs bugs (i, z) == 1 = 1

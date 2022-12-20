@@ -7,7 +7,7 @@ transform sn ls = sn `modPow` ls
   where
     m = 20201227
     modPow b 0 = 1
-    modPow b e = t * modPow ((b * b) `mod` m) (shiftR e 1) `mod` m
+    modPow b e = t * modPow (b * b `mod` m) (shiftR e 1) `mod` m
       where
         t =
           if testBit e 0

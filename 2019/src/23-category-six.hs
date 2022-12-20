@@ -113,7 +113,7 @@ readParam c offset = do
     case pmode of
       0 -> readArray prog >=> readArray prog $ i + offset
       1 -> readArray prog (i + offset)
-      2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+      2 -> readArray prog . (+ bp) =<< readArray prog (i + offset)
 
 readParams :: Integer -> NetworkState s (Integer, Integer)
 readParams c = liftM2 (,) (readParam c 1) (readParam c 2)

@@ -55,5 +55,4 @@ improve h seen = do
 
 eqOpCase :: Char -> Char -> Bool
 eqOpCase a b =
-  (toUpper a == toUpper b) &&
-  ((isUpper a && isLower b) || (isLower a && isUpper b))
+  toUpper a == toUpper b && (isUpper a && isLower b || isLower a && isUpper b)

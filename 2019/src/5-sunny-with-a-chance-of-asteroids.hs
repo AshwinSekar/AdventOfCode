@@ -37,7 +37,7 @@ runProgram' prog i = do
 
 getPmodes instr =
   let pmodes = instr `div` 100
-   in (pmodes `rem` 10, (pmodes `div` 10) `rem` 10)
+   in (pmodes `rem` 10, pmodes `div` 10 `rem` 10)
 
 getParams prog i = do
   instr <- readArray prog i

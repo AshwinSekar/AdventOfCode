@@ -35,8 +35,7 @@ maxFuel gsn =
 
 compute3x3Fuel :: Integer -> (Integer, Integer) -> Integer
 compute3x3Fuel gsn cell =
-  [(i, j) | i <- [0 .. 2], j <- [0 .. 2]] & map (^+ cell) & map (compute gsn) &
-  sum
+  map (compute gsn . (^+ cell)) ([(i, j) | i <- [0 .. 2], j <- [0 .. 2]]) & sum
 
 maxFuelSquare :: Integer -> (Integer, Integer, Integer)
 maxFuelSquare gsn =

@@ -1,24 +1,24 @@
-import Control.Applicative
-import Control.Monad
-import Control.Monad.ST
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State.Lazy
-import Data.Array.ST
-import Data.Bool
-import Data.List
-import qualified Data.Set as Set
-import Debug.Trace
-import Utils
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.ST
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.State.Lazy
+import           Data.Array.ST
+import           Data.Bool
+import           Data.List
+import qualified Data.Set                       as Set
+import           Debug.Trace
+import           Utils
 
 -- prog, instruction pointer, relative base, inputs
 data ProgState = ProgState
-  { ip :: Integer,
-    base :: Integer,
-    pos :: (Integer, Integer),
-    dir :: (Integer, Integer),
+  { ip      :: Integer,
+    base    :: Integer,
+    pos     :: (Integer, Integer),
+    dir     :: (Integer, Integer),
     toPaint :: Bool,
-    white :: Set.Set (Integer, Integer),
-    cnt :: Set.Set (Integer, Integer)
+    white   :: Set.Set (Integer, Integer),
+    cnt     :: Set.Set (Integer, Integer)
   }
   deriving (Show)
 
@@ -83,14 +83,14 @@ paint 0 = liftM2 Set.delete (gets pos) (gets white) >>= putWhite
 updateCnt :: StateT ProgState (ST s) ()
 updateCnt = liftM2 Set.insert (gets pos) (gets cnt) >>= putCnt
 
-turnDir 0 (0, 1) = (-1, 0)
+turnDir 0 (0, 1)  = (-1, 0)
 turnDir 0 (-1, 0) = (0, -1)
 turnDir 0 (0, -1) = (1, 0)
-turnDir 0 (1, 0) = (0, 1)
+turnDir 0 (1, 0)  = (0, 1)
 turnDir 1 (-1, 0) = (0, 1)
 turnDir 1 (0, -1) = (-1, 0)
-turnDir 1 (1, 0) = (0, -1)
-turnDir 1 (0, 1) = (1, 0)
+turnDir 1 (1, 0)  = (0, -1)
+turnDir 1 (0, 1)  = (1, 0)
 
 putWhite p = modify (\s -> s {white = p})
 
@@ -135,15 +135,15 @@ runProgram' prog = do
   i <- gets ip
   instr <- lift $ readArray prog i
   case instr `rem` 100 of
-    1 -> plusMult prog (+)
-    2 -> plusMult prog (*)
-    3 -> input prog
-    4 -> output prog
-    5 -> jump prog (/=)
-    6 -> jump prog (==)
-    7 -> cond prog (<)
-    8 -> cond prog (==)
-    9 -> adjBase prog
+    1  -> plusMult prog (+)
+    2  -> plusMult prog (*)
+    3  -> input prog
+    4  -> output prog
+    5  -> jump prog (/=)
+    6  -> jump prog (==)
+    7  -> cond prog (<)
+    8  -> cond prog (==)
+    9  -> adjBase prog
     99 -> lift $ return []
 
 plusMult :: IntProg s -> IntOp -> StateWithOutputs s

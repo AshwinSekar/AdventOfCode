@@ -37,6 +37,6 @@ main = do
               then Nothing
               else Just (c, p1 ! c))
          (p1 ! 1))
-  putStrLn $ "Part 2: " ++ show (p2 ! 1 * (p2 ! (p2 ! 1)))
+  putStrLn $ "Part 2: " ++ show (p2 ! 1 * p2 ! (p2 ! 1))
   where
     init l@(x:xs) = (Map.fromList $ zip l (xs ++ [x]), x)

@@ -29,7 +29,7 @@ main = do
   putStrLn $ "Part 2: " ++ show p2
 
 solve :: ([Set.Set Char], [Set.Set Char]) -> Int
-solve (ins, out) = read $ join (map (show . ((findCoding ins) !)) out)
+solve (ins, out) = read $ join (map (show . (findCoding ins !)) out)
 
 findCoding :: [Set.Set Char] -> Map.Map (Set.Set Char) Int
 findCoding ins =

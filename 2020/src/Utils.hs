@@ -75,6 +75,7 @@ dir "N" = (1, 0)
 dir "E" = (0, 1)
 dir "S" = (-1, 0)
 dir "W" = (0, -1)
+dir _   = error "invalid direction"
 
 readLines :: [String] -> IO [String]
 readLines lines = do
@@ -146,7 +147,7 @@ modInv a b =
 crt :: [Int] -> [Int] -> Either String Int
 crt residues modulii =
   zipWithM modInv crtModulii modulii >>=
-  (Right . (`mod` modPI) . sum . zipWith (*) crtModulii . zipWith (*) residues)
+  Right . (`mod` modPI) . sum . zipWith (*) crtModulii . zipWith (*) residues
   where
     modPI = product modulii
     crtModulii = (modPI `div`) <$> modulii

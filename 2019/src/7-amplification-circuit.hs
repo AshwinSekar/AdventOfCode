@@ -43,7 +43,7 @@ findThrust :: Bool -> [Integer] -> [Integer] -> Integer
 findThrust p1 prog phase = maximum $ runST (runProgram p1 prog phase)
 
 -- intprog state
-shift offset instr = (instr `div` place) `rem` 10
+shift offset instr = instr `div` place `rem` 10
   where
     place = 10 ^ (offset + 1)
 
@@ -85,7 +85,7 @@ getIP = do
 getProg :: StateT (ProgState s) (ST s) (STArray s Integer Integer)
 getProg = liftM2 (!!) (gets amps) ((`mod` 5) <$> gets currentAmp)
 
-incIP x = ((+ x) <$> getIP) >>= putIP
+incIP x = getIP >>= putIP . (+ x)
 
 putIP :: Integer -> StateT (ProgState s) (ST s) ()
 putIP i = do

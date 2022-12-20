@@ -45,7 +45,7 @@ genSum m state n =
             Just (j0, i0) ->
               gen
                 st'
-                (n - ((n - j') `rem` (j' - j0)))
+                (n - (n - j') `rem` (j' - j0))
                 (i' + (i' - i0) * ((n - j') `div` (j' - j0)))
                 plants'
         where

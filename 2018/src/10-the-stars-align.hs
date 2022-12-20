@@ -32,8 +32,7 @@ main = do
 
 parse :: [String] -> Map Point Velocity
 parse s =
-  map (dropEnd 1) s & map (splitOn "> ") & map (map parse') &
-  map (\[p, v] -> (p, v)) &
+  map ((((\[p, v] -> (p, v)) . map parse') . splitOn "> ") . dropEnd 1) s &
   Map.fromList
   where
     parse' t = drop 10 t & splitOn ", " & map read & \[x, y] -> (x, y)

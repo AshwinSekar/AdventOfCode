@@ -46,6 +46,6 @@ parse' (ns, n:m:is) = (s : ns, is'')
 
 value :: Node -> Integer
 value (Node [] m) = sum (map fromIntegral m)
-value (Node c m) = map (mlen -) m & filter (>= 0) & map (c !!) & map value & sum
+value (Node c m) = map (value . (c !!)) (map (mlen -) m & filter (>= 0)) & sum
   where
     mlen = length c

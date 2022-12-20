@@ -23,7 +23,7 @@ main = do
       slope (r, d) =
         input &
         filter (\(i, str) -> i `rem` d == 0) <&>
-        (\(i, str) -> str !! ((r * (i `div` d)) `rem` length str)) &
+        (\(i, str) -> str !! (r * (i `div` d) `rem` length str)) &
         filter (== '#') &
         length
       p1 = slope (3, 1)

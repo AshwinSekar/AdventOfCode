@@ -23,7 +23,7 @@ rplay seen d1 [] = Left $ sum (zipWith (*) [1 ..] (reverse d1))
 rplay seen d1@(x:d1') d2@(y:d2')
   | (d1, d2) `elem` seen = rplay seen d1 []
   | otherwise =
-    case ((x <= length d1') && (y <= length d2'), x > y, sub) of
+    case (x <= length d1' && y <= length d2', x > y, sub) of
       (True, _, Left _)  -> left
       (True, _, Right _) -> right
       (_, True, _)       -> left

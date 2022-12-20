@@ -58,14 +58,14 @@ shuffle ::
   -> Integer
   -> (Integer, Integer)
   -> (Integer, Integer)
-shuffle techniques d n deck = ((s * (1 - m') * inv (1 - m + d) d) `rem` d, m')
+shuffle techniques d n deck = (s * (1 - m') * inv (1 - m + d) d `rem` d, m')
   where
     (s, m) = foldl' (shuffle' d) deck techniques
     m' = modPow m n d
 
 shuffle' :: Integer -> (Integer, Integer) -> Technique -> (Integer, Integer)
 shuffle' d (s, m) NewStack = ((s + (d - 1) * m) `rem` d, -m)
-shuffle' d (s, m) (Deal n) = (s, (m * inv n d) `rem` d)
+shuffle' d (s, m) (Deal n) = (s, m * inv n d `rem` d)
 shuffle' d (s, m) (Cut n)  = ((s + m * (n + d)) `rem` d, m)
 
 inv n d = (fst (eGCD n d) + d) `rem` d
@@ -73,12 +73,12 @@ inv n d = (fst (eGCD n d) + d) `rem` d
 eGCD 0 b = (0, 1)
 eGCD a b =
   let (s, t) = eGCD (b `mod` a) a
-   in (t - (b `div` a) * s, s)
+   in (t - b `div` a * s, s)
 
 modPow b e 1 = 0
 modPow b 1 m = b `rem` m
 modPow b e m
-  | even e = (x * x) `rem` m
-  | odd e = (b * modPow b (e - 1) m) `rem` m
+  | even e = x * x `rem` m
+  | odd e = b * modPow b (e - 1) m `rem` m
   where
     x = modPow b (e `div` 2) m

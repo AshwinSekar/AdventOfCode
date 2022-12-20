@@ -146,7 +146,7 @@ runProgram' prog = do
     9  -> adjBase prog
     99 -> return ()
 
-shift offset instr = (instr `div` place) `rem` 10
+shift offset instr = instr `div` place `rem` 10
   where
     place = 10 ^ (offset + 1)
 
@@ -166,7 +166,7 @@ readParam prog offset = do
     case pmode of
       0 -> readArray prog >=> readArray prog $ i + offset
       1 -> readArray prog (i + offset)
-      2 -> readArray prog =<< ((+ bp) <$> readArray prog (i + offset))
+      2 -> readArray prog . (+ bp) =<< readArray prog (i + offset)
 
 readParams :: IntProg s -> StateT (ProgState s) (STT s IO) (Integer, Integer)
 readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)

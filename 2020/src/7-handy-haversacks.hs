@@ -46,7 +46,7 @@ bfs adj v f
     v' = Set.union v f'
 
 dfs :: Map.Map String Int -> Adj -> Map.Map String Int
-dfs n = Map.map (Map.foldlWithKey (\a k i -> a + i + i * (n ! k)) 0)
+dfs n = Map.map (Map.foldlWithKey (\a k i -> a + i + i * n ! k) 0)
 
 main :: IO ()
 main = do

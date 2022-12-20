@@ -27,7 +27,7 @@ pairParser = do
   return (key, val)
 
 parser :: Parser PPort
-parser = someTill pairParser newline >>= (return . Map.fromList)
+parser = someTill pairParser newline <&> return . Map.fromList
 
 valid :: PPort -> Bool
 valid (Map.keysSet -> keys) = Set.null $ fields Set.\\ keys

@@ -32,7 +32,7 @@ parser =
 main :: IO ()
 main = do
   (rules, yours, nearby) <- parseFile "data/16-puzzle-input" parser
-  let validRule x ((a, b), (c, d)) = (a <= x && x <= b) || (c <= x && x <= d)
+  let validRule x ((a, b), (c, d)) = a <= x && x <= b || c <= x && x <= d
       validTicket t =
         listToMaybe $
         mapMaybe
