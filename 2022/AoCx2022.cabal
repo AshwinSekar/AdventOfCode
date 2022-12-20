@@ -42,3 +42,21 @@ executable x4
                       containers,
                       megaparsec
     default-language: Haskell2010
+
+executable x5
+    main-is:          5-supply-stacks.hs
+    hs-source-dirs:   src
+    other-modules:    Utils
+    build-depends:    base ^>=4.14.3.0,
+                      containers,
+                      megaparsec
+    default-language: Haskell2010
+
+executable x6
+    main-is:          6-tuning-trouble.hs
+    hs-source-dirs:   src
+    other-modules:    Utils
+    build-depends:    base ^>=4.14.3.0,
+                      containers,
+                      megaparsec
+    default-language: Haskell2010
