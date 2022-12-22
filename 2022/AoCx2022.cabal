@@ -12,87 +12,127 @@ executable x1
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x2
     main-is:          2-rock-paper-scissors.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x3
     main-is:          3-rucksack-reorganization.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x4
     main-is:          4-camp-cleanup.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x5
     main-is:          5-supply-stacks.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x6
     main-is:          6-tuning-trouble.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x7
     main-is:          7-no-space-left-on-device.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x8
     main-is:          8-treetop-tree-house.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x10
     main-is:          10-cathode-ray-tube.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x11
     main-is:          11-monkey-in-the-middle.hs
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
+                      containers,
+                      megaparsec
+    default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
+
+executable x12
+    main-is:          12-hill-climbing-algorithm.hs
+    hs-source-dirs:   src
+    other-modules:    Utils
+    build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec
     default-language: Haskell2010
@@ -104,7 +144,10 @@ executable x21
     hs-source-dirs:   src
     other-modules:    Utils
     build-depends:    base ^>=4.14.3.0,
+                      heap,
                       containers,
                       megaparsec,
                       extra
     default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns

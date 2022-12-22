@@ -29,9 +29,12 @@ module Utils
   , xor
   , bin2dec
   , isqrt
+  , dijkstra
   ) where
 
 import           Control.Monad
+import qualified Data.Heap                  as PQ
+import           Data.Map                   ((!))
 import qualified Data.Map                   as Map
 import           Data.Void
 import           Text.Megaparsec            (ParsecT, errorBundlePretty,
@@ -175,3 +178,19 @@ bin2dec = foldl (\a b -> 2 * a + b) 0
 
 isqrt :: Int -> Int
 isqrt = floor . sqrt . fromIntegral
+
+dijkstra ::
+     Map.Map (Integer, Integer) Integer
+  -> Map.Map (Integer, Integer) Integer
+  -> PQ.MinHeap (Integer, (Integer, Integer))
+  -> Map.Map (Integer, Integer) Integer
+dijkstra _ v (PQ.view -> Nothing) = v
+dijkstra grid v (PQ.view -> Just ((s, p), pq))
+  | p `Map.member` v = dijkstra grid v pq
+  | otherwise = dijkstra grid v' pq'
+  where
+    v' = Map.insert p s v
+    neighs =
+      filter (`Map.member` grid) $
+      filter (`Map.notMember` v) (map (psum p) fourDirs)
+    pq' = foldl (\q x -> PQ.insert (s + grid ! x, x) q) pq neighs
