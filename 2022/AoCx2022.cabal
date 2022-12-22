@@ -88,7 +88,16 @@ executable x10
                       megaparsec
     default-language: Haskell2010
 
-
+executable x11
+    main-is:          11-monkey-in-the-middle.hs
+    hs-source-dirs:   src
+    other-modules:    Utils
+    build-depends:    base ^>=4.14.3.0,
+                      containers,
+                      megaparsec
+    default-language: Haskell2010
+    extensions:       TupleSections
+                      ViewPatterns
 
 executable x21
     main-is:          21-monkey-math.hs
