@@ -151,7 +151,18 @@ executable x14
     default-extensions: TupleSections
                         ViewPatterns
 
-
+executable x15
+    main-is:            15-beacon-exclusion-zone.hs
+    ghc-options:        -Wunused-binds -Wunused-imports -Worphans
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        heap,
+                        containers,
+                        megaparsec
+    default-language:   Haskell2010
+    default-extensions: TupleSections
+                        ViewPatterns
 
 executable x21
     main-is:          21-monkey-math.hs

@@ -6,6 +6,7 @@ module Utils
   , parseFile
   , mcount
   , count
+  , manhattan
   , fourDirs
   , eightDirs
   , eightDirs3D
@@ -14,6 +15,7 @@ module Utils
   , psum
   , psum3
   , psum4
+  , pprod
   , gridMap
   , d2r
   , egcd
@@ -168,6 +170,9 @@ bin2dec = foldl (\a b -> 2 * a + b) 0
 
 isqrt :: Int -> Int
 isqrt = floor . sqrt . fromIntegral
+
+manhattan :: Num a => (a, a) -> (a, a) -> a
+manhattan (a, b) (c, d) = abs (c - a) + abs (d - b)
 
 dijkstra ::
      Map.Map (Integer, Integer) Integer
