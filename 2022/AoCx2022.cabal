@@ -16,7 +16,7 @@ executable x1
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x2
@@ -28,7 +28,7 @@ executable x2
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x3
@@ -40,7 +40,7 @@ executable x3
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x4
@@ -52,7 +52,7 @@ executable x4
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x5
@@ -64,7 +64,7 @@ executable x5
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x6
@@ -76,7 +76,7 @@ executable x6
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x7
@@ -88,7 +88,7 @@ executable x7
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x8
@@ -100,7 +100,7 @@ executable x8
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x10
@@ -112,7 +112,7 @@ executable x10
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x11
@@ -124,7 +124,7 @@ executable x11
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
 
 executable x12
@@ -136,8 +136,22 @@ executable x12
                       containers,
                       megaparsec
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
+
+executable x14
+    main-is:            14-regolith-reservoir.hs
+    hs-source-dirs:     src
+    other-modules:      Utils
+    build-depends:      base ^>=4.14.3.0,
+                        heap,
+                        containers,
+                        megaparsec
+    default-language:   Haskell2010
+    default-extensions: TupleSections
+                        ViewPatterns
+
+
 
 executable x21
     main-is:          21-monkey-math.hs
@@ -149,5 +163,5 @@ executable x21
                       megaparsec,
                       extra
     default-language: Haskell2010
-    extensions:       TupleSections
+    default-extensions:       TupleSections
                       ViewPatterns
