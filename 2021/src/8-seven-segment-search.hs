@@ -11,19 +11,12 @@ import           Utils               hiding (count)
 
 segmentParser :: Parser ([Set.Set Char], [Set.Set Char])
 segmentParser =
-  liftA2
-    (,)
-    (some (Set.fromList <$> word) <* symbol "|")
-    (count 4 (Set.fromList <$> word))
+  liftA2 (,) (some (Set.fromList <$> word) <* symbol "|") (count 4 (Set.fromList <$> word))
 
 main :: IO ()
 main = do
   inputs <- parseFile "data/8-puzzle-input" $ some segmentParser
-  let p1 =
-        sum $
-        map
-          (length . filter (\s -> Set.size s `elem` [2, 4, 3, 7]) . snd)
-          inputs
+  let p1 = sum $ map (length . filter (\s -> Set.size s `elem` [2, 4, 3, 7]) . snd) inputs
       p2 = sum $ map solve inputs
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2
@@ -41,14 +34,4 @@ findCoding ins =
       ([s9], s06) = partition (\s -> Set.size (s4 \\ s) == 0) s069
       ([s0], [s6]) = partition (\s -> Set.size (s7 \\ s) == 0) s06
    in Map.fromList
-        [ (s0, 0)
-        , (s1, 1)
-        , (s2, 2)
-        , (s3, 3)
-        , (s4, 4)
-        , (s5, 5)
-        , (s6, 6)
-        , (s7, 7)
-        , (s8, 8)
-        , (s9, 9)
-        ]
+        [(s0, 0), (s1, 1), (s2, 2), (s3, 3), (s4, 4), (s5, 5), (s6, 6), (s7, 7), (s8, 8), (s9, 9)]

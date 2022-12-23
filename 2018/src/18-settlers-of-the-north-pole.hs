@@ -23,8 +23,7 @@ parse s = listArray ((1, 1), (n, n)) $ concat s
 
 step :: Forest -> Seen -> Integer -> Integer -> Int
 step f seen n i
-  | n == i =
-    length (filter (== '|') $ elems f) * length (filter (== '#') $ elems f)
+  | n == i = length (filter (== '|') $ elems f) * length (filter (== '#') $ elems f)
   | otherwise =
     case (i -) <$> Map.lookup f seen of
       Nothing -> step f' (Map.insert f i seen) n (i + 1)

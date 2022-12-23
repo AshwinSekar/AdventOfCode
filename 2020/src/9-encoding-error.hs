@@ -33,8 +33,7 @@ conSum t nums i j cur
 
 main :: IO ()
 main = do
-  input <-
-    getFile "data/9-puzzle-input" <&> map read <&> zip [1 ..] <&> Map.fromList
+  input <- getFile "data/9-puzzle-input" <&> map read <&> zip [1 ..] <&> Map.fromList
   let p1 = findInvalid 26 input
       p2 = conSum p1 input 1 2 (input ! 1)
   putStrLn $ "Part 1: " ++ show p1

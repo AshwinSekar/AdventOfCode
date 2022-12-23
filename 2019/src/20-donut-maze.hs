@@ -38,8 +38,7 @@ main = do
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2
 
-findShortestPath ::
-     Maze -> PortalMap -> (Int, Int) -> ((Int, Int), Maybe Int) -> Maybe Int
+findShortestPath :: Maze -> PortalMap -> (Int, Int) -> ((Int, Int), Maybe Int) -> Maybe Int
 findShortestPath maze portals start end =
   let pq = PQ.singleton (0, (start, 0))
       v = Map.empty
@@ -63,11 +62,8 @@ parsePortal grid =
       openMap = Map.fromListWith (++) open
       (("AA", [(start, 1)]), openMap') = Map.deleteFindMin openMap
       (("ZZ", [(end, 1)]), openMap'') = Map.deleteFindMax openMap'
-      portalPoints =
-        map (\[(i, _), (j, l)] -> (i, (j, l))) $ Map.elems openMap''
-      portals =
-        portalPoints ++
-        map (\[(i, l), (j, _)] -> (j, (i, l))) (Map.elems openMap'')
+      portalPoints = map (\[(i, _), (j, l)] -> (i, (j, l))) $ Map.elems openMap''
+      portals = portalPoints ++ map (\[(i, l), (j, _)] -> (j, (i, l))) (Map.elems openMap'')
       findV (i, j) =
         let surroundings = [(i + 2, j), (i + 1, j), (i - 1, j), (i - 2, j)]
             alpha = filter isAlpha $ map (grid !) surroundings

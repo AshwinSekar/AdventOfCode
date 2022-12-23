@@ -37,11 +37,9 @@ import qualified Data.Heap                  as PQ
 import           Data.Map                   ((!))
 import qualified Data.Map                   as Map
 import           Data.Void
-import           Text.Megaparsec            (ParsecT, errorBundlePretty,
-                                             runParserT, some)
+import           Text.Megaparsec            (ParsecT, errorBundlePretty, runParserT, some)
 import           Text.Megaparsec.Char       (letterChar, space)
-import qualified Text.Megaparsec.Char.Lexer as L (decimal, lexeme, signed,
-                                                  symbol)
+import qualified Text.Megaparsec.Char.Lexer as L (decimal, lexeme, signed, symbol)
 
 type Parser = ParsecT Void String IO
 
@@ -62,16 +60,10 @@ word = lexeme (some letterChar)
 
 fourDirs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
-eightDirs =
-  [(0, 1), (1, 1), (1, 0), (0, -1), (-1, -1), (-1, 0), (-1, 1), (1, -1)]
+eightDirs = [(0, 1), (1, 1), (1, 0), (0, -1), (-1, -1), (-1, 0), (-1, 1), (1, -1)]
 
 eightDirs3D =
-  [ (x, y, z)
-  | x <- [-1 .. 1]
-  , y <- [-1 .. 1]
-  , z <- [-1 .. 1]
-  , abs x + abs y + abs z > 0
-  ]
+  [(x, y, z) | x <- [-1 .. 1], y <- [-1 .. 1], z <- [-1 .. 1], abs x + abs y + abs z > 0]
 
 eightDirs4D =
   [ (x, y, z, w)
@@ -137,8 +129,7 @@ pprod (x, y) (x', y') = (x * x', y * y')
 
 gridMap :: [[a]] -> Map.Map (Integer, Integer) a
 gridMap input =
-  Map.fromList . join $
-  zipWith (\i s -> zipWith (\j c -> ((i, j), c)) [0 ..] s) [0 ..] input
+  Map.fromList . join $ zipWith (\i s -> zipWith (\j c -> ((i, j), c)) [0 ..] s) [0 ..] input
 
 d2r theta = pi * theta / 180
 
@@ -154,8 +145,7 @@ modInv a b =
   case egcd a b of
     (x, y)
       | a * x + b * y == 1 -> Right x
-      | otherwise ->
-        Left $ "No modular inverse for " ++ show a ++ " and " ++ show b
+      | otherwise -> Left $ "No modular inverse for " ++ show a ++ " and " ++ show b
 
 modCeil a n =
   if a `mod` n == 0
@@ -190,7 +180,5 @@ dijkstra grid v (PQ.view -> Just ((s, p), pq))
   | otherwise = dijkstra grid v' pq'
   where
     v' = Map.insert p s v
-    neighs =
-      filter (`Map.member` grid) $
-      filter (`Map.notMember` v) (map (psum p) fourDirs)
+    neighs = filter (`Map.member` grid) $ filter (`Map.notMember` v) (map (psum p) fourDirs)
     pq' = foldl (\q x -> PQ.insert (s + grid ! x, x) q) pq neighs

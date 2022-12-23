@@ -9,9 +9,7 @@ import           Utils
 
 main :: IO ()
 main = do
-  cave <-
-    Map.map (toInteger . digitToInt) . gridMap <$>
-    getFile "data/15-puzzle-input"
+  cave <- Map.map (toInteger . digitToInt) . gridMap <$> getFile "data/15-puzzle-input"
   let v = dijkstra cave Map.empty $ PQ.singleton (0, (0, 0))
       goal@(w, h) = fst $ Map.findMax cave
       tileate :: (Integer, Integer) -> Map.Map (Integer, Integer) Integer
@@ -41,7 +39,5 @@ dijkstra grid v (PQ.view -> Just ((s, p), pq))
   | otherwise = dijkstra grid v' pq'
   where
     v' = Map.insert p s v
-    neighs =
-      filter (`Map.member` grid) $
-      filter (`Map.notMember` v) (map (psum p) fourDirs)
+    neighs = filter (`Map.member` grid) $ filter (`Map.notMember` v) (map (psum p) fourDirs)
     pq' = foldl (\q x -> PQ.insert (s + grid ! x, x) q) pq neighs

@@ -94,9 +94,8 @@ main = do
 eval :: Prog -> Int -> Registers -> Registers
 eval prog ip r =
   case Map.lookup i prog of
-    Nothing -> r
-    Just Instr {op, a, b, c} ->
-      eval prog ip $ Map.adjust (+ 1) ip (run op r a b c)
+    Nothing                  -> r
+    Just Instr {op, a, b, c} -> eval prog ip $ Map.adjust (+ 1) ip (run op r a b c)
   where
     i = r ! ip
 
@@ -104,8 +103,7 @@ evalDup :: Map Int Int -> Prog -> Int -> Int -> Registers -> Maybe Int
 evalDup seen prog ip n r =
   case (i, Map.lookup i prog, Map.member (r ! 1) seen) of
     (_, Nothing, _) -> Nothing
-    (18, _, _) ->
-      evalDup seen prog ip n $ Map.adjust (`div` 256) 2 (Map.insert ip 8 r)
+    (18, _, _) -> evalDup seen prog ip n $ Map.adjust (`div` 256) 2 (Map.insert ip 8 r)
     (29, Just Instr {op, a, b, c}, True) -> Just $ (fst . head) sorted
     (29, Just Instr {op, a, b, c}, False) ->
       evalDup seen' prog ip (n + 1) $ Map.adjust (+ 1) ip (run op r a b c)

@@ -62,9 +62,7 @@ neigh :: Num a => (a, a) -> [(a, a)]
 neigh (x, y) = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
 
 neigh' :: Num a => (a, a) -> [(a, a)]
-neigh' (x, y) =
-  (x + 1, y + 1) :
-  (x + 1, y - 1) : (x - 1, y + 1) : (x - 1, y - 1) : neigh (x, y)
+neigh' (x, y) = (x + 1, y + 1) : (x + 1, y - 1) : (x - 1, y + 1) : (x - 1, y - 1) : neigh (x, y)
 
 mapArrWithI :: (IArray t a, IArray t b, Ix i) => (i -> a -> b) -> t i a -> t i b
 mapArrWithI f arr = array (bounds arr) [(i, f i (arr ! i)) | i <- indices arr]

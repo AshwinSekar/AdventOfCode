@@ -5,11 +5,7 @@ import           Utils
 
 type Seats = Map.Map (Integer, Integer) Char
 
-findStable ::
-     (Seats -> (Integer, Integer) -> Char -> Char)
-  -> Set.Set Seats
-  -> Seats
-  -> Int
+findStable :: (Seats -> (Integer, Integer) -> Char -> Char) -> Set.Set Seats -> Seats -> Int
 findStable step seen seats
   | Set.member seats seen = count (== '#') $ Map.elems seats
   | otherwise = findStable step seen' seats'
@@ -36,7 +32,5 @@ ray8Adj seats pos = mapMaybe (look pos) eightDirs
 main :: IO ()
 main = do
   seats <- gridMap <$> getFile "data/11-puzzle-input"
-  putStrLn $
-    "Part 1: " ++ show (findStable (seatFlip imm8Adj 4) Set.empty seats)
-  putStrLn $
-    "Part 2: " ++ show (findStable (seatFlip ray8Adj 5) Set.empty seats)
+  putStrLn $ "Part 1: " ++ show (findStable (seatFlip imm8Adj 4) Set.empty seats)
+  putStrLn $ "Part 2: " ++ show (findStable (seatFlip ray8Adj 5) Set.empty seats)

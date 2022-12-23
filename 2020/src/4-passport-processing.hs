@@ -53,8 +53,6 @@ main = do
   pports <- parseFile "data/4-puzzle-input" (some parser)
   let p1 = length $ filter valid pports
       p2 =
-        filter valid pports &
-        filter (\p -> Map.size (Map.filterWithKey validField p) == 7) &
-        length
+        filter valid pports & filter (\p -> Map.size (Map.filterWithKey validField p) == 7) & length
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2

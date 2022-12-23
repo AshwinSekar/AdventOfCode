@@ -14,9 +14,8 @@ import           Data.Maybe           (mapMaybe)
 import qualified Data.Set             as Set
 import           Text.Megaparsec      (MonadParsec (try), choice, some)
 import           Text.Megaparsec.Char (char, newline, printChar)
-import           Utils                (Parser, count, decimal, fourDirs,
-                                       getFile, gridMap, lexeme, parseFile,
-                                       psum, slices, symbol, word)
+import           Utils                (Parser, count, decimal, fourDirs, getFile, gridMap, lexeme,
+                                       parseFile, psum, slices, symbol, word)
 
 data Block
   = Rock

@@ -28,8 +28,7 @@ type Parser = ParsecT Void String IO
 parser :: (Integral a) => Parser (NonEmpty (Point a))
 parser = liftA2 (:|) pointParser (pointParser `sepEndBy` space)
   where
-    pointParser =
-      Point <$> liftA2 (,) (decimal <* string ", ") (decimal <* newline)
+    pointParser = Point <$> liftA2 (,) (decimal <* string ", ") (decimal <* newline)
 
 newtype Point a =
   Point (a, a)
@@ -41,8 +40,7 @@ instance (Ord a) => Semigroup (Point a) where
   Point (x, y) <> Point (x', y') = Point (max x x', max y y')
 
 perim :: (Integral p, Ord p) => ((p, p), (p, p)) -> [(p, p)]
-perim ((x0, y0), (x, y)) =
-  [(x0, ), (x, ), (, y0), (, y)] <*> [(min x0 y0) .. (max x y)]
+perim ((x0, y0), (x, y)) = [(x0, ), (x, ), (, y0), (, y)] <*> [(min x0 y0) .. (max x y)]
 
 manhattan :: Num p => (p, p) -> (p, p) -> p
 manhattan (x, y) (xp, yp) = abs (x - xp) + abs (y - yp)
@@ -59,11 +57,7 @@ main = do
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2
 
-getFiniteAreas ::
-     (Integral p, Ord p, Ix p)
-  => Map Int (p, p)
-  -> (p, p)
-  -> ST s (STUArray s Int Int)
+getFiniteAreas :: (Integral p, Ord p, Ix p) => Map Int (p, p) -> (p, p) -> ST s (STUArray s Int Int)
 getFiniteAreas pmap (\(x, y) -> ((0, 0), (x, y)) -> bnds) = do
   counts <- newArray (0, Map.size pmap - 1) 0
   forM_ (range bnds) $ inc counts . findClosest pmap

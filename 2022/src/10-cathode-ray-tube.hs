@@ -11,8 +11,8 @@ import qualified Data.Set             as Set
 import           GHC.Float            (double2Int)
 import           Text.Megaparsec      (choice, some)
 import           Text.Megaparsec.Char (newline, printChar)
-import           Utils                (Parser, count, decimal, getFile,
-                                       parseFile, signed, slices, symbol, word)
+import           Utils                (Parser, count, decimal, getFile, parseFile, signed, slices,
+                                       symbol, word)
 
 data Operation
   = Noop
@@ -20,8 +20,7 @@ data Operation
   deriving (Eq, Show)
 
 operationParser :: Parser Operation
-operationParser =
-  choice [symbol "noop" $> Noop, Addx <$> (symbol "addx" *> signed)]
+operationParser = choice [symbol "noop" $> Noop, Addx <$> (symbol "addx" *> signed)]
 
 calculate (cycle, x, vals) Noop = (cycle + 1, x, Map.insert cycle x vals)
 calculate (cycle, x, vals) (Addx c) =

@@ -12,8 +12,8 @@ import           Data.Tuple.Extra     (both)
 import           GHC.Float            (double2Int)
 import           Text.Megaparsec      (choice, some)
 import           Text.Megaparsec.Char (newline, printChar)
-import           Utils                (Parser, count, decimal, getFile,
-                                       parseFile, slices, symbol, word)
+import           Utils                (Parser, count, decimal, getFile, parseFile, slices, symbol,
+                                       word)
 
 data Operation
   = Const (Complex Double)
@@ -47,8 +47,7 @@ monkeyParser = liftA2 (,) word (symbol ":" *> operationParser)
 
 main :: IO ()
 main = do
-  monkeys <-
-    Map.fromList <$> parseFile "data/21-puzzle-input" (some monkeyParser)
+  monkeys <- Map.fromList <$> parseFile "data/21-puzzle-input" (some monkeyParser)
   let solve _ (Const i)    = i
       solve vals (Add s t) = vals ! s + vals ! t
       solve vals (Mul s t) = vals ! s * vals ! t
@@ -59,8 +58,6 @@ main = do
       vals' = Map.map (solve vals') monkeys'
       (left, right) = both (vals' !) (children $ monkeys ! "root")
       p1 = double2Int . realPart $ vals ! "root"
-      p2 =
-        double2Int $
-        (realPart left - realPart right) / (imagPart right - imagPart left)
+      p2 = double2Int $ (realPart left - realPart right) / (imagPart right - imagPart left)
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2

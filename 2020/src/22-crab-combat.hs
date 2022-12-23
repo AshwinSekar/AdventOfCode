@@ -4,11 +4,7 @@ import           Text.Megaparsec     (some)
 import           Utils
 
 parser :: Parser ([Int], [Int])
-parser =
-  liftA2
-    (,)
-    (symbol "Player 1:" *> some decimal)
-    (symbol "Player 2:" *> some decimal)
+parser = liftA2 (,) (symbol "Player 1:" *> some decimal) (symbol "Player 2:" *> some decimal)
 
 play :: [Int] -> [Int] -> Int
 play [] d2 = sum $ zipWith (*) [1 ..] (reverse d2)

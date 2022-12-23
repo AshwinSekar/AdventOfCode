@@ -51,7 +51,6 @@ main = do
     "Part 2: " ++
     show
       (iterate (\m -> foldl addField m fields) (rules, Map.empty) &
-       find (Map.null . fst) <&> snd <&>
-       Map.filterWithKey (\s _ -> "departure" `isPrefixOf` s) <&>
+       find (Map.null . fst) <&> snd <&> Map.filterWithKey (\s _ -> "departure" `isPrefixOf` s) <&>
        product &
        fromJust)

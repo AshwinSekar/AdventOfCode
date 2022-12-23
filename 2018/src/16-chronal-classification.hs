@@ -21,8 +21,7 @@ type Parser = ParsecT Void String IO
 
 sampleParser :: Parser Sample
 sampleParser =
-  Sample <$> between (string "Before: [") (string "]") regParser <* newline <*>
-  instrParser <*
+  Sample <$> between (string "Before: [") (string "]") regParser <* newline <*> instrParser <*
   newline <*>
   between (string "After:  [") (string "]") regParser <*
   newline
@@ -31,14 +30,11 @@ regParser :: Parser Registers
 regParser = decimal `sepEndBy` string ", " <&> zip [0 ..] <&> Map.fromList
 
 instrParser :: Parser Instr
-instrParser =
-  Instr <$> decimal <* space <*> decimal <* space <*> decimal <* space <*>
-  decimal
+instrParser = Instr <$> decimal <* space <*> decimal <* space <*> decimal <* space <*> decimal
 
 parser :: Parser ([Sample], [Instr])
 parser =
-  (,) <$> sampleParser `sepEndBy1` newline <* many newline <*>
-  instrParser `sepEndBy1` newline
+  (,) <$> sampleParser `sepEndBy1` newline <* many newline <*> instrParser `sepEndBy1` newline
 
 type Registers = Map Int Int
 

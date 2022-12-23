@@ -8,18 +8,15 @@ import           Text.Megaparsec     (some)
 import           Utils
 
 coordsParser :: Parser (Set.Set (Int, Int))
-coordsParser =
-  Set.fromList <$> some (liftA2 (,) decimal (symbol "," >> decimal))
+coordsParser = Set.fromList <$> some (liftA2 (,) decimal (symbol "," >> decimal))
 
 foldParser :: Parser (Int, Int)
 foldParser =
-  symbol "fold along" >>
-  (0, ) <$> (symbol "y=" >> decimal) <|> (, 0) <$> (symbol "x=" >> decimal)
+  symbol "fold along" >> (0, ) <$> (symbol "y=" >> decimal) <|> (, 0) <$> (symbol "x=" >> decimal)
 
 main :: IO ()
 main = do
-  (coords, folds) <-
-    parseFile "data/13-puzzle-input" $ liftA2 (,) coordsParser (some foldParser)
+  (coords, folds) <- parseFile "data/13-puzzle-input" $ liftA2 (,) coordsParser (some foldParser)
   let p1 = Set.size $ fold coords (head folds)
       final = foldl fold coords folds
       (maxx, maxy) = (maximum (Set.map fst final), maximum (Set.map snd final))

@@ -94,10 +94,9 @@ main = do
 eval :: Prog -> Int -> Registers -> Registers
 eval prog ip r =
   case (i, Map.lookup i prog) of
-    (_, Nothing) -> r
-    (1, _) -> Map.insert 0 (sumFactors $ r ! 4) r
-    (_, Just Instr {op, a, b, c}) ->
-      eval prog ip $ Map.adjust (+ 1) ip (run op r a b c)
+    (_, Nothing)                  -> r
+    (1, _)                        -> Map.insert 0 (sumFactors $ r ! 4) r
+    (_, Just Instr {op, a, b, c}) -> eval prog ip $ Map.adjust (+ 1) ip (run op r a b c)
   where
     i = r ! ip
 

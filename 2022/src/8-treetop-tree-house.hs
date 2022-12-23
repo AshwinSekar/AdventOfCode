@@ -9,8 +9,8 @@ import           Data.Maybe           (mapMaybe)
 import qualified Data.Set             as Set
 import           Text.Megaparsec      (choice, some)
 import           Text.Megaparsec.Char (newline, printChar)
-import           Utils                (Parser, count, decimal, getFile, gridMap,
-                                       parseFile, psum, slices, symbol, word)
+import           Utils                (Parser, count, decimal, getFile, gridMap, parseFile, psum,
+                                       slices, symbol, word)
 
 main :: IO ()
 main = do

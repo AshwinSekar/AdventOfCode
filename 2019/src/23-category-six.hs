@@ -145,8 +145,7 @@ runNetwork :: [Integer] -> STT s IO ()
 runNetwork intprog = do
   progs <- replicateM 50 $ newArray (0, 4096) 0
   forM_ progs (\p -> zipWithM_ (writeArray p) [0 ..] intprog)
-  zipWith (\i p -> (i, Comp 0 0 p (Seq.singleton i) [])) [0 .. 49] progs &
-    Map.fromList &
+  zipWith (\i p -> (i, Comp 0 0 p (Seq.singleton i) [])) [0 .. 49] progs & Map.fromList &
     Network 0 Nothing Nothing &
     evalStateT runNetwork'
 

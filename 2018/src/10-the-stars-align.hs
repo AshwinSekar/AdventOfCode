@@ -31,9 +31,7 @@ main = do
   putStrLn $ "Part 2: " ++ show p2
 
 parse :: [String] -> Map Point Velocity
-parse s =
-  map ((((\[p, v] -> (p, v)) . map parse') . splitOn "> ") . dropEnd 1) s &
-  Map.fromList
+parse s = map ((((\[p, v] -> (p, v)) . map parse') . splitOn "> ") . dropEnd 1) s & Map.fromList
   where
     parse' t = drop 10 t & splitOn ", " & map read & \[x, y] -> (x, y)
 
@@ -44,13 +42,10 @@ msg :: Map Point Velocity -> Bool
 msg (Map.keys -> ps) = avgDiff < 0.05 && avgDiff > 0.041
   where
     starDiff (p', d) p = (p, max d $ (^$+) (p ^- p'))
-    avgDiff =
-      fromIntegral (snd (foldl' starDiff (head ps, 0) ps)) /
-      fromIntegral (length ps)
+    avgDiff = fromIntegral (snd (foldl' starDiff (head ps, 0) ps)) / fromIntegral (length ps)
 
 printStar :: [Point] -> IO ()
-printStar stars =
-  clearScreen >> traverse_ printStar' stars' >> setCursorPosition 50 0
+printStar stars = clearScreen >> traverse_ printStar' stars' >> setCursorPosition 50 0
   where
     stars' = map (^- minimum stars) stars
     printStar' (x, y) = setCursorPosition y x >> putChar '#'

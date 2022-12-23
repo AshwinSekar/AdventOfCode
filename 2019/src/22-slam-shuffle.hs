@@ -52,12 +52,7 @@ deal n deck =
       indexD = tail $ scanl deal' (-n, 0) deck
    in map snd $ sort indexD
 
-shuffle ::
-     [Technique]
-  -> Integer
-  -> Integer
-  -> (Integer, Integer)
-  -> (Integer, Integer)
+shuffle :: [Technique] -> Integer -> Integer -> (Integer, Integer) -> (Integer, Integer)
 shuffle techniques d n deck = (s * (1 - m') * inv (1 - m + d) d `rem` d, m')
   where
     (s, m) = foldl' (shuffle' d) deck techniques

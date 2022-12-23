@@ -34,8 +34,7 @@ run v i a prog =
     v' = Set.insert i v
 
 terminate :: (Prog -> (Int, Bool)) -> Prog -> (Int, Bool)
-terminate eval prog =
-  map (\j -> eval $ Map.adjust adj j prog) [0 .. n] & filter snd & head
+terminate eval prog = map (\j -> eval $ Map.adjust adj j prog) [0 .. n] & filter snd & head
   where
     n = Map.size prog - 1
     adj (Nop x) = Jmp x

@@ -12,9 +12,7 @@ main = do
   let inputs = splitString (== ',') input
       intprog = map read inputs
       p1 = runST $ runProgram intprog (12, 2)
-      results =
-        map (\x -> (x, runST $ runProgram intprog x)) $
-        liftA2 (,) [0 .. 99] [0 .. 99]
+      results = map (\x -> (x, runST $ runProgram intprog x)) $ liftA2 (,) [0 .. 99] [0 .. 99]
       Just ((noun, verb), _) = find ((== 19690720) . snd) results
       p2 = 100 * noun + verb
   putStrLn $ "Part 1: " ++ show p1

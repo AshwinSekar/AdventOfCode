@@ -65,13 +65,10 @@ main = do
   putStrLn $ "Part 1: " ++ show (length grid')
   putStrLn $ "Part 2: " ++ show (length grid'')
   where
-    findMinY (xClay, yClay) =
-      min (minimum $ map (fst . snd) xClay) (minimum $ map fst yClay)
-    findMaxY (xClay, yClay) =
-      max (maximum $ map (snd . snd) xClay) (maximum $ map fst yClay)
+    findMinY (xClay, yClay) = min (minimum $ map (fst . snd) xClay) (minimum $ map fst yClay)
+    findMaxY (xClay, yClay) = max (maximum $ map (snd . snd) xClay) (maximum $ map fst yClay)
 
-scanWater ::
-     (Integral a, Ix a) => Clays a -> a -> STT s IO (STArray s (a, a) Status)
+scanWater :: (Integral a, Ix a) => Clays a -> a -> STT s IO (STArray s (a, a) Status)
 scanWater (xClay, yClay) maxY = do
   grid <- newSTArray ((0, 0), (3000, maxY + 1)) Sand
   let start = (500, 0)
@@ -101,13 +98,9 @@ scanWater (xClay, yClay) maxY = do
         case (isRest down, isLRest left, isRRest right) of
           (True, True, False) -> write LRest pos
           (True, False, True) -> write RRest pos
-          (True, True, True) -> write Rest pos >> go (x - 1, y) >> go (x + 1, y)
-          _ -> return ()
-  traverse_
-    (\(x, (y0, y1)) -> forM_ (range ((x, y0), (x, y1))) (write Clay))
-    xClay
-  traverse_
-    (\(y, (x0, x1)) -> forM_ (range ((x0, y), (x1, y))) (write Clay))
-    yClay
+          (True, True, True)  -> write Rest pos >> go (x - 1, y) >> go (x + 1, y)
+          _                   -> return ()
+  traverse_ (\(x, (y0, y1)) -> forM_ (range ((x, y0), (x, y1))) (write Clay)) xClay
+  traverse_ (\(y, (x0, x1)) -> forM_ (range ((x0, y), (x1, y))) (write Clay)) yClay
   go start
   return grid

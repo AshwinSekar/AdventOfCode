@@ -11,8 +11,7 @@ import qualified Data.Set                   as Set
 import           Data.Void
 import           Debug.Trace
 import           Text.Megaparsec
-import           Text.Megaparsec.Char       (asciiChar, char, lowerChar,
-                                             newline, spaceChar, string)
+import           Text.Megaparsec.Char       (asciiChar, char, lowerChar, newline, spaceChar, string)
 import           Text.Megaparsec.Char.Lexer (decimal)
 import           Utils
 

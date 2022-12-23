@@ -28,9 +28,7 @@ main = do
 
 maxFuel :: Integer -> (Integer, Integer)
 maxFuel gsn =
-  [(i, j) | i <- [1 .. 298], j <- [1 .. 298]] &
-  map (\s -> (compute3x3Fuel gsn s, s)) &
-  maximum &
+  [(i, j) | i <- [1 .. 298], j <- [1 .. 298]] & map (\s -> (compute3x3Fuel gsn s, s)) & maximum &
   snd
 
 compute3x3Fuel :: Integer -> (Integer, Integer) -> Integer
@@ -46,9 +44,7 @@ maxFuelSquare gsn =
   snd
   where
     cells =
-      [(i, j) | i <- [1 .. 300], j <- [1 .. 300]] &
-      map (\s -> (s, compute gsn s)) &
-      Map.fromList
+      [(i, j) | i <- [1 .. 300], j <- [1 .. 300]] & map (\s -> (s, compute gsn s)) & Map.fromList
     rects = computeRect cells (300, 300) Map.empty
 
 computeRect :: Grid -> (Integer, Integer) -> Grid -> Grid
@@ -57,12 +53,10 @@ computeRect cells (0, y) r = computeRect cells (300, y - 1) r
 computeRect cells c@(x, y) r = computeRect cells (x - 1, y) r'
   where
     r' = Map.insert (x, y) rect r
-    rect =
-      r |! (x + 1, y) + r |! (x, y + 1) - r |! (x + 1, y + 1) + cells Map.! c
+    rect = r |! (x + 1, y) + r |! (x, y + 1) - r |! (x + 1, y + 1) + cells Map.! c
 
 computeSquare :: Grid -> (Integer, Integer, Integer) -> Integer
-computeSquare r (x, y, z) =
-  r |! (x, y) - r |! (x + z, y) - r |! (x, y + z) + r |! (x + z, y + z)
+computeSquare r (x, y, z) = r |! (x, y) - r |! (x + z, y) - r |! (x, y + z) + r |! (x + z, y + z)
 
 compute :: Integer -> (Integer, Integer) -> Integer
 compute gsn (x, y) = (rackId * y + gsn) * rackId `div` 100 `rem` 10 - 5

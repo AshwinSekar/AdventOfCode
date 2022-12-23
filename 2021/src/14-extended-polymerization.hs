@@ -11,9 +11,7 @@ import           Utils
 rulesParser :: Parser (Map.Map (Char, Char) Char)
 rulesParser =
   Map.fromList <$>
-  some
-    (liftA2 (,) (liftA2 (,) letterChar letterChar) (symbol " -> " *> letterChar) <*
-     newline)
+  some (liftA2 (,) (liftA2 (,) letterChar letterChar) (symbol " -> " *> letterChar) <* newline)
 
 main :: IO ()
 main = do
@@ -41,9 +39,8 @@ polymerize ::
   -> Map.Map (Char, Char) Int
 polymerize rules (b, c) cnt m =
   case rules !? (b, c) of
-    Just new ->
-      Map.insertWith (+) (b, new) cnt $ Map.insertWith (+) (new, c) cnt m
-    Nothing -> Map.insertWith (+) (b, c) cnt m
+    Just new -> Map.insertWith (+) (b, new) cnt $ Map.insertWith (+) (new, c) cnt m
+    Nothing  -> Map.insertWith (+) (b, c) cnt m
 
 score :: Char -> Map.Map (Char, Char) Int -> Int
 score c pcounts = maximum counts - minimum counts

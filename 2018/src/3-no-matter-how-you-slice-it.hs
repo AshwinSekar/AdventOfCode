@@ -53,8 +53,7 @@ main = do
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2
 
-getCounts ::
-     (Ix a) => [Claim a] -> ((a, a), (a, a)) -> ST s (STUArray s (a, a) Int)
+getCounts :: (Ix a) => [Claim a] -> ((a, a), (a, a)) -> ST s (STUArray s (a, a) Int)
 getCounts claims bnds = do
   counts <- newArray bnds 0
   forM_ claims (\c -> forM_ (squares c) $ inc counts)
@@ -62,8 +61,7 @@ getCounts claims bnds = do
   where
     inc c i = writeArray c i . succ =<< readArray c i
 
-findUnique ::
-     (Ix a, Integral e, IArray i e) => i (a, a) e -> [Claim a] -> Maybe a
+findUnique :: (Ix a, Integral e, IArray i e) => i (a, a) e -> [Claim a] -> Maybe a
 findUnique counts claims = iD <$> find unique claims
   where
     unique c = all ((== 1) . (counts !)) $ squares c

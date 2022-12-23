@@ -67,8 +67,7 @@ findShortestRobotPath maze =
    in evalState roboBFS $ BFSState pq v maze' k
   where
     findDirs (sy, sx) = [(sy + 1, sx), (sy - 1, sx), (sy, sx + 1), (sy, sx - 1)]
-    findStarts (sy, sx) =
-      [(sy + 1, sx + 1), (sy - 1, sx - 1), (sy - 1, sx + 1), (sy + 1, sx - 1)]
+    findStarts (sy, sx) = [(sy + 1, sx + 1), (sy - 1, sx - 1), (sy - 1, sx + 1), (sy + 1, sx - 1)]
     isStart p = maze ! p == '@'
 
 parseMaze :: [String] -> Maze
@@ -100,8 +99,7 @@ bfs' p loc@(pos, k) = do
     (46, True, _) -> updateV loc p >> bfs
     (46, False, _) -> updateV loc p >> addDirs loc p >> bfs
     (35, _, _) -> bfs
-    (c, False, True) ->
-      updateV (pos, withK c) p >> addDirs (pos, withK c) p >> bfs
+    (c, False, True) -> updateV (pos, withK c) p >> addDirs (pos, withK c) p >> bfs
     (c, False, False) ->
       if canPass c
         then updateV loc p >> addDirs loc p >> bfs
@@ -142,8 +140,7 @@ addRoboDirs p others (y, x) k = do
   m <- gets maze
   v <- gets visited
   pq <- gets pq
-  map add ds & filter (notWall m) & filter (canOpen m) & filter (notVisited v) &
-    map (pickupKeys m) &
+  map add ds & filter (notWall m) & filter (canOpen m) & filter (notVisited v) & map (pickupKeys m) &
     foldl (ins p) pq &
     putPQ
   where

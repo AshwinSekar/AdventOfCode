@@ -10,8 +10,7 @@ import qualified Data.Set                   as Set
 import           Data.Void
 import           Debug.Trace
 import           Text.Megaparsec
-import           Text.Megaparsec.Char       (asciiChar, char, lowerChar,
-                                             newline, spaceChar, string)
+import           Text.Megaparsec.Char       (asciiChar, char, lowerChar, newline, spaceChar, string)
 import           Text.Megaparsec.Char.Lexer (decimal)
 import           Utils
 
@@ -45,9 +44,7 @@ main = do
       p1 = maximum ids
       [p2] =
         filter
-          (\s ->
-             Set.member (s + 1) ids &&
-             Set.member (s - 1) ids && not (Set.member s ids))
+          (\s -> Set.member (s + 1) ids && Set.member (s - 1) ids && not (Set.member s ids))
           [0 .. p1]
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2

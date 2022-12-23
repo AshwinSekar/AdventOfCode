@@ -36,8 +36,7 @@ parseInt (ints, g, sl) s =
     readDigits n = s & read . takeWhile isDigit . drop n
 
 freqMin :: [(Int, Int)] -> (Int, Int)
-freqMin ints =
-  concatMap splitTuple ints & sort & scanl accumInt (0, 0) & maximum
+freqMin ints = concatMap splitTuple ints & sort & scanl accumInt (0, 0) & maximum
   where
     splitTuple (b, e) = [(b, 1), (e, -1)]
     accumInt (cnt, _) (g, sign) = (cnt + sign, g)

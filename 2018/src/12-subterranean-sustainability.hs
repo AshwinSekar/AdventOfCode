@@ -30,9 +30,7 @@ main = do
 
 parse :: [String] -> Set [Bool]
 parse s =
-  map (splitOn " => ") s & filter ((== "#") . (!! 1)) &
-  map (map (== '#') . (!! 0)) &
-  Set.fromList
+  map (splitOn " => ") s & filter ((== "#") . (!! 1)) & map (map (== '#') . (!! 0)) & Set.fromList
 
 genSum :: Set [Bool] -> [Bool] -> Int -> Int
 genSum m state n =
@@ -50,9 +48,7 @@ genSum m state n =
                 plants'
         where
           (length -> add, plants') =
-            False : False : False : False : plants &
-            (++ [False, False, False, False]) &
-            divvy 5 1 &
+            False : False : False : False : plants & (++ [False, False, False, False]) & divvy 5 1 &
             map (`Set.member` m) &
             dropWhileEnd not &
             span not

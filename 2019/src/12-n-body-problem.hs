@@ -66,8 +66,7 @@ calcG' a a' =
     GT -> -1
 
 totalEnergy :: MoonState -> Int
-totalEnergy (pos, vs) =
-  sum $ zipWith energy (map absTuple pos) (map absTuple vs)
+totalEnergy (pos, vs) = sum $ zipWith energy (map absTuple pos) (map absTuple vs)
 
 energy :: (Int, Int, Int) -> (Int, Int, Int) -> Int
 energy (x, y, z) (xv, yv, zv) = (x + y + z) * (xv + yv + zv)

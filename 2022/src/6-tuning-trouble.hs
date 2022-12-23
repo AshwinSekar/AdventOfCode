@@ -7,8 +7,7 @@ import           Data.Map            ((!))
 import qualified Data.Map            as Map
 import qualified Data.Set            as Set
 import           Text.Megaparsec     (choice, some)
-import           Utils               (Parser, count, decimal, getFile,
-                                      parseFile, slices, symbol)
+import           Utils               (Parser, count, decimal, getFile, parseFile, slices, symbol)
 
 data Status
   = Searching Int

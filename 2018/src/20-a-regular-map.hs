@@ -65,8 +65,7 @@ main :: IO ()
 main = do
   putStrLn "Input:"
   input <- getLine
-  Right (visited -> dists) <-
-    evalStateT (runParserT (parser @Int) "" input) initial
+  Right (visited -> dists) <- evalStateT (runParserT (parser @Int) "" input) initial
   putStrLn $ "Part 1: " ++ show (maximum dists)
   putStrLn $ "Part 2: " ++ show (Map.size $ Map.filter (>= 1000) dists)
   where

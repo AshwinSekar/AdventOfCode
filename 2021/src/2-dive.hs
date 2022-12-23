@@ -8,8 +8,7 @@ import           Utils
 
 commandParser :: Parser (Int, Int)
 commandParser =
-  (, 0) <$> (symbol "forward" >> decimal) <|>
-  (0, ) <$> (symbol "down" >> decimal) <|>
+  (, 0) <$> (symbol "forward" >> decimal) <|> (0, ) <$> (symbol "down" >> decimal) <|>
   (0, ) <$> (symbol "up" >> (0 -) <$> decimal)
 
 main :: IO ()

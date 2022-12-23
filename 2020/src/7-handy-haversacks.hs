@@ -6,8 +6,7 @@ import qualified Data.Map             as Map
 import qualified Data.Set             as Set
 import           Data.Tuple
 import           Data.Void
-import           Text.Megaparsec      (choice, sepBy1, sepEndBy, someTill, try,
-                                       (<|>))
+import           Text.Megaparsec      (choice, sepBy1, sepEndBy, someTill, try, (<|>))
 import           Text.Megaparsec.Char (letterChar, spaceChar)
 import           Utils
 
@@ -29,9 +28,7 @@ ruleParser =
     (,)
     (someTill letterSpace (symbol " bags contain"))
     (choice
-       [ try $ Map.fromList <$> valueParser `sepBy1` symbol ","
-       , symbol "no other bags" $> Map.empty
-       ])
+       [try $ Map.fromList <$> valueParser `sepBy1` symbol ",", symbol "no other bags" $> Map.empty])
 
 parser :: Parser Adj
 parser = Map.fromList <$> ruleParser `sepEndBy` symbol "."

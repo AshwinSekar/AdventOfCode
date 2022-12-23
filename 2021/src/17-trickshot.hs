@@ -21,14 +21,9 @@ main = do
   let start = (0, 0)
       (xlow, _) = invTriRange (x0, x1)
       tri n = n * (n + 1) `div` 2
-      invTriRange (l, l') =
-        ((isqrt (1 + 8 * l) + 1) `div` 2, isqrt (1 + 8 * l') `div` 2)
+      invTriRange (l, l') = ((isqrt (1 + 8 * l) + 1) `div` 2, isqrt (1 + 8 * l') `div` 2)
       validC x c = x0 <= tri x - tri c && tri x - tri c <= x1
-      xlows =
-        mapMaybe (\x -> (x, ) <$> find (validC x) [0 .. (x - 1)]) [xlow .. x1]
-      xhighs =
-        mapMaybe
-          (\x -> (x, ) <$> find (validC x) [(x - 1),(x - 2) .. 0])
-          [xlow .. x1]
+      xlows = mapMaybe (\x -> (x, ) <$> find (validC x) [0 .. (x - 1)]) [xlow .. x1]
+      xhighs = mapMaybe (\x -> (x, ) <$> find (validC x) [(x - 1),(x - 2) .. 0]) [xlow .. x1]
   putStrLn $ "Part 1: " ++ show (tri (-y0 - 1))
 -- putStrLn $ "Part 2: " ++ show (score (head init) p2)

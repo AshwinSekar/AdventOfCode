@@ -35,11 +35,7 @@ flashAll octopi =
     else flashAll octopi'
   where
     readyToFlash o = Map.keysSet $ Map.filter (> 9) o
-    octopi' =
-      Set.foldl
-        (\o p -> foldl inc (flash p o) (neighs p o))
-        octopi
-        (readyToFlash octopi)
+    octopi' = Set.foldl (\o p -> foldl inc (flash p o) (neighs p o)) octopi (readyToFlash octopi)
     flash p = Map.insert p 0
     inc = flip $ Map.adjust (+ 1)
     neighs p o = filter (isJust . valid o) $ map (psum p) eightDirs

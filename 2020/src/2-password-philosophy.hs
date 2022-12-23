@@ -28,8 +28,7 @@ valid ((lo, hi, char), pswd) = lo <= occ && occ <= hi
     occ = length $ filter (== char) pswd
 
 valid2 :: (Policy Int, String) -> Bool
-valid2 ((i, j, char), pswd) =
-  (pswd !! (i - 1) == char) /= (pswd !! (j - 1) == char)
+valid2 ((i, j, char), pswd) = (pswd !! (i - 1) == char) /= (pswd !! (j - 1) == char)
 
 main :: IO ()
 main = do

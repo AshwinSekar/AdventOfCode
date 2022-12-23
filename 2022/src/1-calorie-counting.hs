@@ -10,9 +10,7 @@ import           Utils                      (parseFile)
 
 main :: IO ()
 main = do
-  input <-
-    parseFile "data/1-puzzle-input" $
-    some (some (L.decimal <* newline) <* space)
+  input <- parseFile "data/1-puzzle-input" $ some (some (L.decimal <* newline) <* space)
   let calories = reverse . sort $ map sum input
       p1 = head calories
       p2 = sum $ map (calories !!) [0, 1, 2]

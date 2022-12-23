@@ -33,12 +33,10 @@ scanPolymer' h seen n = do
 
 improvePolymer :: Handle -> IO Int
 improvePolymer h =
-  map (, (0, [])) ['A' .. 'Z'] & Map.fromList & improve h & (Map.elems <$>) &
-  (minimum <$>) &
+  map (, (0, [])) ['A' .. 'Z'] & Map.fromList & improve h & (Map.elems <$>) & (minimum <$>) &
   (fst <$>)
 
-improve ::
-     Handle -> Map.Map Char (Int, String) -> IO (Map.Map Char (Int, String))
+improve :: Handle -> Map.Map Char (Int, String) -> IO (Map.Map Char (Int, String))
 improve h seen = do
   c <- hGetChar h
   if c == '\n'
@@ -54,5 +52,4 @@ improve h seen = do
       | otherwise = (n + 1, c : s)
 
 eqOpCase :: Char -> Char -> Bool
-eqOpCase a b =
-  toUpper a == toUpper b && (isUpper a && isLower b || isLower a && isUpper b)
+eqOpCase a b = toUpper a == toUpper b && (isUpper a && isLower b || isLower a && isUpper b)

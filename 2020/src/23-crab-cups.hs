@@ -6,8 +6,7 @@ import           Data.List         (unfoldr)
 import           Utils
 
 play :: Int -> (Map.HashMap Int Int, Int) -> (Map.HashMap Int Int, Int)
-play m (cups, cur) =
-  (Map.insert cur d cups & Map.insert c e & Map.insert n a, d)
+play m (cups, cur) = (Map.insert cur d cups & Map.insert c e & Map.insert n a, d)
   where
     select 0 = select m
     select n =

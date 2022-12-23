@@ -18,14 +18,10 @@ main :: IO ()
 main = do
   rucksacks <- getFile "data/3-puzzle-input"
   let p1 =
-        rucksacks &
-        map
-          (priority .
-           head . uncurry intersect . (\s -> splitAt (length s `div` 2) s)) &
+        rucksacks & map (priority . head . uncurry intersect . (\s -> splitAt (length s `div` 2) s)) &
         sum
       p2 =
-        slices 3 rucksacks &
-        map (priority . head . (\[a, b, c] -> a `intersect` b `intersect` c)) &
+        slices 3 rucksacks & map (priority . head . (\[a, b, c] -> a `intersect` b `intersect` c)) &
         sum
   putStrLn $ "Part 1: " ++ show p1
   putStrLn $ "Part 2: " ++ show p2

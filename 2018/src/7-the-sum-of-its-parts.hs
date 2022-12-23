@@ -28,8 +28,7 @@ main = do
   putStrLn $ "Part 2: " ++ show p2
 
 parse :: [String] -> AdjList
-parse inputs =
-  map edges inputs & (++ map sources inputs) & Map.fromListWith Set.union
+parse inputs = map edges inputs & (++ map sources inputs) & Map.fromListWith Set.union
   where
     edges s = ((0, s !! 36), Set.singleton $ s !! 5)
     sources s = ((0, s !! 5), Set.empty)

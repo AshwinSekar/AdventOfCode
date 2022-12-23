@@ -13,20 +13,13 @@ parser =
     (someTill (lexeme $ some letterChar) $ symbol "(contains")
     (some letterChar `sepBy` symbol "," <* symbol ")")
 
-solve ::
-     Map.Map String (Set.Set String)
-  -> Map.Map String String
-  -> Map.Map String String
+solve :: Map.Map String (Set.Set String) -> Map.Map String String -> Map.Map String String
 solve poss mapping
   | all Set.null poss = mapping
   | otherwise = solve poss' mapping'
   where
     solved = Map.filter ((== 1) . Set.size) poss
-    mapping' =
-      Map.foldlWithKey
-        (\m a (Set.toList -> [i]) -> Map.insert a i m)
-        mapping
-        solved
+    mapping' = Map.foldlWithKey (\m a (Set.toList -> [i]) -> Map.insert a i m) mapping solved
     poss' = Map.map (\s -> s Set.\\ Set.unions solved) poss
 
 main :: IO ()
@@ -38,7 +31,5 @@ main = do
           [(a, Set.fromList ings) | (ings, allergs) <- input, a <- allergs]
   putStrLn $
     "Part 1: " ++
-    show
-      (length
-         [i | (ings, allergs) <- input, i <- ings, i `notElem` Set.unions poss])
+    show (length [i | (ings, allergs) <- input, i <- ings, i `notElem` Set.unions poss])
   putStrLn $ "Part 2: " ++ intercalate "," (Map.elems $ solve poss Map.empty)

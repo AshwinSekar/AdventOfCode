@@ -93,8 +93,7 @@ readParams prog = liftM2 (,) (readParam prog 1) (readParam prog 2)
 
 {-# ANN writeParam "Hlint: ignore Reduce duplication" #-}
 
-writeParam ::
-     IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
+writeParam :: IntProg s -> Integer -> Integer -> StateT (ProgState s) (STT s IO) ()
 writeParam prog offset val = do
   i <- gets ip
   bp <- gets base

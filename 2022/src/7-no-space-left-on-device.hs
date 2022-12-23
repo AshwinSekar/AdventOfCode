@@ -9,8 +9,8 @@ import           Data.Maybe           (mapMaybe)
 import qualified Data.Set             as Set
 import           Text.Megaparsec      (choice, some)
 import           Text.Megaparsec.Char (newline, printChar)
-import           Utils                (Parser, count, decimal, getFile,
-                                       parseFile, slices, symbol, word)
+import           Utils                (Parser, count, decimal, getFile, parseFile, slices, symbol,
+                                       word)
 
 dirSizeLimit = 100000
 
@@ -30,11 +30,7 @@ data Files
   deriving (Eq, Show)
 
 lsParser :: Parser Files
-lsParser =
-  choice
-    [ symbol "dir" *> (Dir <$> word)
-    , File <$> decimal <*> some printChar <* newline
-    ]
+lsParser = choice [symbol "dir" *> (Dir <$> word), File <$> decimal <*> some printChar <* newline]
 
 commandParser :: Parser Command
 commandParser =
@@ -46,8 +42,7 @@ commandParser =
 
 main :: IO ()
 main = do
-  commands <-
-    parseFile "data/7-puzzle-input" $ symbol "$ cd /" *> some commandParser
+  commands <- parseFile "data/7-puzzle-input" $ symbol "$ cd /" *> some commandParser
   let fileSize (File s _) = s
       fileSize (Dir _)    = 0
       dirName _ (File _ _) = Nothing
@@ -63,9 +58,7 @@ main = do
       walk _ _ _ = error "should not happen"
       filetree = walk Map.empty ["/"] commands
       sizes =
-        Map.mapWithKey
-          (\path (size, children) -> size + sum (map (sizes !) children))
-          filetree
+        Map.mapWithKey (\path (size, children) -> size + sum (map (sizes !) children)) filetree
       p1 = sum $ Map.filter (<= dirSizeLimit) sizes
       neededSpace = unusedSpaceNeeded - (totalDiskSpace - sizes ! ["/"])
       Just p2 = Map.elems sizes & sort & find (>= neededSpace)

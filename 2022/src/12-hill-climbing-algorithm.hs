@@ -11,9 +11,8 @@ import           Data.Maybe           (mapMaybe)
 import qualified Data.Set             as Set
 import           Text.Megaparsec      (MonadParsec (try), choice, some)
 import           Text.Megaparsec.Char (char, newline, printChar)
-import           Utils                (Parser, count, decimal, fourDirs,
-                                       getFile, gridMap, lexeme, parseFile,
-                                       psum, slices, symbol, word)
+import           Utils                (Parser, count, decimal, fourDirs, getFile, gridMap, lexeme,
+                                       parseFile, psum, slices, symbol, word)
 
 type Grid = Map.Map (Integer, Integer) Integer
 
@@ -29,15 +28,12 @@ dijkstra grid v (PQ.view -> Just ((s, p), pq))
     v' = Map.insert p s v
     neighs =
       filter (\p' -> grid ! p' <= curElevation + 1) $
-      filter (`Map.member` grid) $
-      filter (`Map.notMember` v) (map (psum p) fourDirs)
+      filter (`Map.member` grid) $ filter (`Map.notMember` v) (map (psum p) fourDirs)
     pq' = foldl (\q x -> PQ.insert (s + 1, x) q) pq neighs
 
 main :: IO ()
 main = do
-  hills <-
-    Map.map (\c -> toInteger $ ord c - 97) . gridMap <$>
-    getFile "data/12-puzzle-input"
+  hills <- Map.map (\c -> toInteger $ ord c - 97) . gridMap <$> getFile "data/12-puzzle-input"
   let Just (start, _) = find ((== -14) . snd) $ Map.assocs hills
       Just (end, _) = find ((== -28) . snd) $ Map.assocs hills
       elevations = Map.insert start 0 $ Map.insert end 25 hills
